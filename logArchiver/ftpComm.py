@@ -159,14 +159,6 @@ class ftpClient(object):
     def createDir(self, dirname):
         self.client.mkd(dirname)
 
-    def listDirInfo(self, detail=False):
-        """ List directory information. """
-        if detail:
-            return self.client.dir()
-        else:
-            return self.client.nlst()
-
-
     def swithToDir(self, dir):
         """ Switch to the target directory. """
         self.client.cwd(dir)

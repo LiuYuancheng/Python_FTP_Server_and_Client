@@ -16,6 +16,8 @@ def main():
         client.createDir('client1')
         client.swithToDir('client1')
     print("test upload file")
+    print(client.listDirInfo())
+    print(client.listDirInfo(detail=True))
     localFile = os.path.join(dir,'109474714_S7300_ModbusRTU_TIA_DOC_v30_en.pdf')
     client.uploadFile(localFile, 'uploadfile.pdf')
     print("test downloadfile")
