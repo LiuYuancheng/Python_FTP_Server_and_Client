@@ -1,0 +1,19 @@
+# This is the config file template for the module <c2App.py>
+# Setup the paramter with below format (every line follows <key>:<val> format, the
+# key can not be changed):
+
+#-----------------------------------------------------------------------------
+AGENT_ID:Test
+
+FTP_SER_IP:127.0.0.1
+FTP_SER_PORT:8081
+
+USER_NAME:admin
+USER_PWD:123456
+
+RCD_JSON:uploadRcd.json
+
+
+#-----------------------------------------------------------------------------
+LOG_DIR:AgentLogFolder
+LOG_PF:.txt

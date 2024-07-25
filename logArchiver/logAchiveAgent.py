@@ -14,14 +14,14 @@
 #-----------------------------------------------------------------------------
 
 import os
+import time
 import json
 import platform
 
 import ConfigLoader
 import ftpComm
 
-
-TEST_MD = False
+TEST_MD = False # test mode to connect to the FTP server.True: not connect False: connect
 
 dirpath = os.path.dirname(os.path.abspath(__file__))
 
@@ -58,7 +58,7 @@ class recordMgr(ConfigLoader.JsonLoader):
 #-----------------------------------------------------------------------------
 class LogAchiveAgent():
     def __init__(self):
-        
+        self.agentID = CONFIG_DICT['AGENT_ID']
         self.targetDir = os.path.join(dirpath, CONFIG_DICT['LOG_DIR'])
         # 
         self.serverIP = CONFIG_DICT['FTP_SER_IP']
@@ -66,11 +66,12 @@ class LogAchiveAgent():
         self.user= CONFIG_DICT['USER_NAME']
         self.password = CONFIG_DICT['USER_PWD']
         # Init the logfile list uploaded to the FTP server.
-        self.logFileList = []
         self.recordLoader = recordMgr()
         rcdFIle = os.path.join(dirpath, CONFIG_DICT['RCD_JSON'])
         self.loadRcdFile(rcdFIle)
-        self.logFileList = self.recordLoader.getJsonData()
+
+        self.terminate = False
+
         if not TEST_MD:
             self.client = ftpComm.ftpClient(self.serverIP, self.serverPort, self.user, self.password)
             print("LogAchiveAgent: Start to login to the log server...")
@@ -116,7 +117,7 @@ class LogAchiveAgent():
     #-----------------------------------------------------------------------------
     def swithHome(self):
         self.client.swithToDir('/')
-        homeDir = CONFIG_DICT['AGENT_ID']
+        homeDir = self.agentID
         try:
             rst = self.client.swithToDir(homeDir)
         except Exception as erro:
@@ -141,17 +142,40 @@ class LogAchiveAgent():
         try:
             self.client.uploadFile(localFilePath, fileName)
             print("LogAchiveAgent: successfully uploaded file %s" %fileName)
+            return True 
         except Exception as erro:
             print("LogAchiveAgent: Failed to upload file %s" %fileName)
+            print("Error: %s" %erro)
+            return False 
 
+    #-----------------------------------------------------------------------------
+    def run(self):
+        print("LogAchiveAgent[ID=%s]: start log archive main loop" %self.agentID)
+        while not self.terminate:
+            logfileList = self.getNewUploadFiles()
+            uploadedCount = 0
+            for filepath in logfileList:
+                rst = self.startUpload(filepath)
+                if rst:
+                    self.recordLoader.addOneFile(filepath)
+                    uploadedCount += 1
+            print("Upload progress finished [%d/%d]" %(uploadedCount, len(logfileList)))
+            self.recordLoader.sortFileList()
+            self.recordLoader.updateRcdFile()
+            time.sleep(10)
+
+    #-----------------------------------------------------------------------------
+    def stop(self):
+        self.terminate = True
+        self.client.close()
+        print("LogAchiveAgent[ID=%s]: stop log archive main loop" %self.agentID)
+
+#-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 def main():
     logAchiveAgent = LogAchiveAgent()
-    data = logAchiveAgent.getNewUploadFiles()
-    tsetFile = data[0]
-    logAchiveAgent.startUpload(tsetFile)
-    tsetFile = data[-1]
-    logAchiveAgent.startUpload(tsetFile)
+    logAchiveAgent.run()
 
+#-----------------------------------------------------------------------------
 if __name__ == "__main__":
     main()
