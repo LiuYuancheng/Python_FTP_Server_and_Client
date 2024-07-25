@@ -1,0 +1,19 @@
+2024-07-12 08:48:24,607 INFO     Start to process scenario file: tempScenarioFile.txt
+2024-07-12 08:48:24,608 INFO     Step1: load threats report.
+2024-07-12 08:48:24,622 INFO     - Finished.
+2024-07-12 08:48:24,732 INFO     Step2: parse the vulnerabilies.
+2024-07-12 08:48:28,687 INFO     - Get 4 matched CWE.
+2024-07-12 08:48:28,789 INFO     Step3: generate the report file
+2024-07-12 08:48:28,790 INFO     creatReport(): Report file created: C:\Works\NCL\Project\Threat_2_MITRE_Mapper\src\ReportFolder\tempScenarioFile_Cwe_2024_07_12_08_48_28.json
+2024-07-12 08:48:28,791 INFO     Downloading result...
+2024-07-12 08:49:12,662 INFO     Start to process scenario file: tempScenarioFile.txt
+2024-07-12 08:49:12,665 INFO     -Finished
+2024-07-12 08:49:12,770 INFO     Step2: summarize scenario and get attack behaviors list.
+2024-07-12 08:49:15,302 INFO      - Found 10 attack behaviors
+2024-07-12 08:49:15,409 INFO     Step3: map every behavior to MITRE ATT&CK Matrix (tactic, technique)
+2024-07-12 08:49:27,189 INFO      - Found 6 mapped MITRE ATT&CK tactic
+2024-07-12 08:49:27,297 INFO     Step4: verifiy whether the technique can match the scenario
+2024-07-12 08:49:38,600 INFO     - verifiy finished
+2024-07-12 08:49:38,705 INFO     Step5: Generate the report file
+2024-07-12 08:49:38,707 INFO     creatReport(): Report file created: C:\Works\NCL\Project\Threat_2_MITRE_Mapper\src\ReportFolder\tempScenarioFile_Atk_2024_07_12_08_49_38.json
+2024-07-12 08:49:38,708 INFO     Downloading result...

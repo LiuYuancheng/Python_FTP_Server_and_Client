@@ -187,6 +187,10 @@ class ftpClient(object):
         print("Ftp client inited.")
 
     #-----------------------------------------------------------------------------
+    def getConnectionStatus(self): 
+        return self.connected
+
+    #-----------------------------------------------------------------------------
     def connectToServer(self):
         """ Connect to FTP server. """
         try:
@@ -212,7 +216,13 @@ class ftpClient(object):
 
     #-----------------------------------------------------------------------------
     def listDirInfo(self, detail=False):
-        """ List directory information. """
+        """ List directory information on FTP server under current directory.
+            detail == True: return a list of the file or dir.
+            detail == False : return folder detail information such as: 
+                -rw-rw-rw-   1 owner    group      336512 Mar 09  2023 Hacking.pdf
+                drwxrwxrwx   1 owner    group           0 Jul 24 08:54 Test
+                drwxrwxrwx   1 owner    group           0 Jul 23 09:57 client1
+        """
         if detail:
             return self.client.dir()
         else:
@@ -281,6 +291,7 @@ def main():
             elif choice == 3:
                 print(client.listDirInfo(detail=True))
             else:
+                print("exit...")
                 break
         client.close()
     elif choice == 2:
@@ -289,6 +300,7 @@ def main():
         dir = os.path.join(DIR_PATH, 'ftpServer_data')
         server = ftpServer(dir, port=serverPort, threadFlg=True)
         server.startServer()
+    print("exit...")
 
 #-----------------------------------------------------------------------------
 if __name__ == "__main__":
