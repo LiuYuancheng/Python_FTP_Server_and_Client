@@ -3,7 +3,8 @@
 # Name:        logArchiveServer.py
 #
 # Purpose:     This module will provide a FTP server which can run in parallel 
-#              thread for file transfer.
+#              thread for file transfer and provide a web UI for user to check 
+#              the log files in the server.
 # 
 # Author:      Yuancheng Liu
 #
@@ -16,14 +17,15 @@
 import os
 import platform
 import threading
-
 from flask import Flask, render_template, send_from_directory, abort
 
 import ConfigLoader
 import ftpComm
 
 DIR_PATH = dirpath = os.path.dirname(os.path.abspath(__file__))
+slashCar = '\\' if platform.system() == "Windows" else '/'
 
+#Load the agent config file 
 CONFIG_FILE_NAME = 'ServerConfig.txt'
 gGonfigPath = os.path.join(dirpath, CONFIG_FILE_NAME)
 iConfigLoader = ConfigLoader.ConfigLoader(gGonfigPath, mode='r')
@@ -33,25 +35,25 @@ if iConfigLoader is None:
 CONFIG_DICT = iConfigLoader.getJson()
 
 ROOT_DIR = os.path.join(dirpath, CONFIG_DICT['LOG_DIR'])
-slashCar = '\\' if platform.system() == "Windows" else '/'
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class FTPService(threading.Thread):
+    """ FTP server service which can run parallel with the program main thread."""
     
     def __init__(self, parent) -> None:
         threading.Thread.__init__(self)
-
+        # Create the FTP root folder if it is not exist.
         self.logArchiveDir = ROOT_DIR
+        if not os.path.exists(self.logArchiveDir): os.makedirs(self.logArchiveDir)
+        # Init the FTP server 
         self.servicePort = int(CONFIG_DICT['FTP_SER_PORT'])
         maxUploadSpeed = int(CONFIG_DICT['MAX_UPLOAD_SPEED'])
         maxDownloadSpeed = int(CONFIG_DICT['MAX_DOWNLOAD_SPEED'])
-        
         userRcdFile = os.path.join(DIR_PATH, CONFIG_DICT['USER_RCD'])
         userInfoLoader = ConfigLoader.JsonLoader()
         userInfoLoader.loadFile(userRcdFile)
         userData = userInfoLoader.getJsonData()
-
         self.server = ftpComm.ftpServer(self.logArchiveDir, port=self.servicePort, userDict=userData, 
                                         readMaxSp=maxDownloadSpeed, writeMaxSp=maxUploadSpeed, 
                                         threadFlg=True)
@@ -67,23 +69,18 @@ class FTPService(threading.Thread):
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
-
-#-----------------------------------------------------------------------------
-
+# Start he FTP server service thread
 iFTPservice = FTPService(None)
 iFTPservice.start()
-
+# Init the web interface.
 app = Flask(__name__)
 
 @app.route('/')
 @app.route('/index')
 @app.route('/<path:subpath>')
 def show_directory(subpath=''):
-
     subpathList = subpath.split('/')
-
     current_path = None
-    
     # remove the duplicate in the path sub path.
     for i in range(len(subpathList)):
         testSubpath = slashCar.join(subpathList[i:])
@@ -92,7 +89,6 @@ def show_directory(subpath=''):
             current_path = testPath
             subpath = '/'.join(subpathList[i:])
             break
-
     if current_path is None: abort(404)
     print(current_path)
     if os.path.isdir(current_path):
@@ -101,8 +97,7 @@ def show_directory(subpath=''):
         print(contents)
         directories = [d for d in contents if os.path.isdir(os.path.join(current_path, d))]
         files = [f for f in contents if os.path.isfile(os.path.join(current_path, f))]
-        print(files)
-        
+        #print(files)
         return render_template('index.html', subpath=subpath, directories=directories, files=files)
     else:
         # Serve a file
