@@ -17,7 +17,15 @@
 
 ### Introduction
 
+Some times we want to continuously collect log files from a lot servers used for big data analysis, this program will create a FTP client and server and the log archiver which can synchronize the node's specific log storage server with the log storage. It also provide a web interface for user the check and download the log file from the web archive server. 
 
+
+
+
+
+
+
+ 
 
 
 

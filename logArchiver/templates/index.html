@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<head>
+    <title> Log Directory Viewer</title>
+</head>
+<body>
+    <h2> Log Directory Viewer </h2>
+    <hr>
+    <h3>Directory listing for: {{ subpath }}</h3>
+    <h3>Sub-directory number: {{ directories|length }}</h3>
+    <h3>Current folder log file numbber: {{ files|length }}</h3>
+    <ul>
+        {% for directory in directories %}
+            <li><a href="{{ subpath }}/{{ directory }}">{{ directory }}/</a></li>
+        {% endfor %}
+        {% for file in files %}
+            <li><a href="{{ subpath }}/{{ file }}">{{ file }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -25,7 +25,7 @@ TEST_MD = False # test mode to connect to the FTP server.True: not connect False
 
 dirpath = os.path.dirname(os.path.abspath(__file__))
 
-CONFIG_FILE_NAME = 'ConfigAgent.txt'
+CONFIG_FILE_NAME = 'AgentConfig.txt'
 gGonfigPath = os.path.join(dirpath, CONFIG_FILE_NAME)
 iConfigLoader = ConfigLoader.ConfigLoader(gGonfigPath, mode='r')
 if iConfigLoader is None:
