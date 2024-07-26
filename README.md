@@ -1,14 +1,14 @@
 # Python_FTP_Server_and_Client
 
-### Distributed Log File Auto Archive Program
+### Distributed Log File Automated Archive System
 
 ![](doc/img/title.png)
 
-**Program Design Purpose**: We want to create a FTP server and client program example for file transfer, then we will build a computers cluster Log file archive system to collect the log file regularly from multiple nodes then save in the file server, and provide a web interface in the log file archive server for user to check. 
+**Program Design Purpose**: This project aims to create an FTP server&client lib program for file transfer and a Log files synchronization system for log data archiving. We will develop an automated log file archive system that regularly collects newly generated log files from multiple nodes in a computer cluster and saves them on a central log file historian server. Additionally, a web interface will be provided on the log file historian server to allow users to access and review the archived logs.
 
 ```
 # Created:     2024/07/23
-# Version:     v_0.0.1
+# Version:     v_0.1.1
 # Copyright:   Copyright (c) 2024 LiuYuancheng
 # License:     MIT License
 ```
@@ -21,13 +21,15 @@
 
 ### Introduction
 
-Some times we want to continuously collect log files from a lot servers used for big data analysis, this program will create a FTP client and server and the log archiver which can synchronize the node's specific log storage server with the log storage. It also provide a web interface for user the check and download the log file from the web archive server. The project include 3 components :
+Often, there is a need to continuously collect program log files from numerous servers for big data analysis, system operation monitoring, or threat detection. This project will create an automated log file archiver, which can synchronize specific log storage on nodes with a central log storage server. Additionally, it provides a web interface for users to check and download log files from the web archive server. The project includes three components:
 
-- **FTP Communication Library:** A  lib module provide the FTP client and server for log file transfer. 
-- **Log Archive Agent**: A agent program running on the nodes in the compute cluster to regularly check the log data status and upload the new generated log file to log archive server via FTP client.
-- **Log Archive Server**: A service program running on the Log data base server to maintain several file structure trees which are exactly same as the client node to save the log files and provide a web interface for user to search and view the logs.
+- **FTP Communication Library** : A library module providing FTP client and server functionality for log file transfer.
+- **Log Archive Agent** : An agent program running on the nodes in the compute cluster to regularly check the log data status and upload newly generated log files to the log archive server with the FTP client.
+- **Log Archive Server:** A service program running on the log database server to maintain several file structure trees identical to those on the client nodes, save the log files, and provide a web interface for users to search and view the logs.
 
 
+
+------
 
 #### Introduction of FTP Comm Library
 
@@ -76,7 +78,7 @@ All the agent will connect to the server to upload the log files, the server wil
 
 ### System Design
 
-#### 
+#### [Under editing]
 
 
 
