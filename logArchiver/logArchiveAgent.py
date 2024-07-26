@@ -15,7 +15,7 @@
 #-----------------------------------------------------------------------------
 """ Program design:
     Log archive agent will keep a archived files record json file to record the 
-    files which have been transfered to the server.It will follow below steps to 
+    files which have been transferred to the server.It will follow below steps to 
     archive the new log file: 
     1. When the agent start, it will check the record file and load the file list.
     2. It will check the log file directory (user set in the config file) and find 
