@@ -196,7 +196,7 @@ FLASK_DEBUG_MD:False
 FLASK_MULTI_TH:True
 ```
 
-Then add a valid user in the userRcd.json file and set the permission (refer to the design of Log Archive server side permission config), as shown the example below:
+Then add a valid user in the `userRcd.json` file and set the permission (refer to the design of Log Archive server side permission config), as shown the example below:
 
 ```json
 {
@@ -224,3 +224,64 @@ python3 logArchiveServer.py
 
 Change the `AgentConfig_template.txt` to `AgentConfig.txt` then follow the comments in it to set the parameters as shown the example below:
 
+```
+# This is the config file template for the module <logArchiveAgent.py>
+# Setup the parameter with below format (every line follows <key>:<val> format, the
+# key can not be changed):
+
+#-----------------------------------------------------------------------------
+# Unique Agent ID, all the log file will be saved in the server's home/<AGENT_ID>/ folder
+AGENT_ID:Test
+
+#-----------------------------------------------------------------------------
+# FTP server info and login credentials, don't uplaod the credentials to the Github
+FTP_SER_IP:127.0.0.1
+FTP_SER_PORT:8081
+USER_NAME:agent
+USER_PWD:P@ssw0rd
+
+#-----------------------------------------------------------------------------
+# Uploaded files record json file, need to be at same folder of <logArchiveAgent.py>
+# if not exist, the agent will create a empty one.
+RCD_JSON:uploadRcd.json
+
+#-----------------------------------------------------------------------------
+# local folder save the log files. 
+LOG_DIR:AgentLogFolder
+# the file extension of the log files such as : .txt, .log, .csv, etc.
+LOG_PF:.txt
+
+#-----------------------------------------------------------------------------
+# Time interval between 2 uplaod processes, in seconds.
+UPLOAD_INV:10
+```
+
+Run the log archive agent program:
+
+```
+python logAchiveAgent.py
+```
+
+
+
+##### View Log from Web UI
+
+To view the archived log file in the server, type in the URL `http://<webhost_IPaddress>:5000` to view the web interface and download the log files:
+
+![](doc/img/webUI.png)
+
+------
+
+### Reference 
+
+- pyftpdlib : https://pypi.org/project/pyftpdlib/
+
+------
+
+### Problem and Solution
+
+Refer to `doc/ProblemAndSolution.md`
+
+------
+
+> last edit by LiuYuancheng (liu_yuan_cheng@hotmail.com) by 27/07/2024 if you have any problem, please send me a message. 
