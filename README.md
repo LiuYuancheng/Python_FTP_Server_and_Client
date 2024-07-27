@@ -95,6 +95,20 @@ All agents will connect to the server to upload log files. The server manages ag
 - **FTP Service** : An FTP server running in the background to handle log file uploads.
 - **Log Search and Download Web Host:** A web host program providing a user interface for checking, viewing, and downloading the log files archived on the server.
 
+In the server side user permission config please follow below permission char setting table:
+
+| Character | Permission type  | Description                      | FTP Command                                             |
+| --------- | ---------------- | -------------------------------- | ------------------------------------------------------- |
+| `"e"`     | Read permission  | Allow client to change directory | `CWD`, `CDUP` commands                                  |
+| `"l"`     | Read permission  | Allow client to list files       | `LIST`, `NLST`, `STAT`, `MLSD`, `MLST`, `SIZE` commands |
+| `"r"`     | Read permissions | Retrieve file from the server    | `RETR` command                                          |
+| `"a"`     | Write permission | Append data to an existing file  | `APPE` command                                          |
+| `"d"`     | Write permission | Delete file or directory         | `DELE`, `RMD` commands                                  |
+| `"f"`     | Write permission | Rename file or directory         | `RNFR`, `RNTO` commands                                 |
+| `"m"`     | Write permission | Create directory                 | `MKD` command                                           |
+| `"M"`     | Write permission | Change file mode / permission    | `SITE CHMOD` command                                    |
+| `"T"`     | Write permission | Change file modification time    | `SITE MFMT` command                                     |
+
 
 
 ------
@@ -114,6 +128,99 @@ All agents will connect to the server to upload log files. The server manages ag
 
 ##### Program Files List 
 
-| Program File        | Execution Env | Description                                                  |
-| ------------------- | ------------- | ------------------------------------------------------------ |
-| src/plcSimulator.py | python 3.7 +  | The main PLC simulator lib provides the simulator interface, Real world emulation app connector and the Modbus-TCP sub-threading service. |
+| Folder | Program File         | Execution Env | Description                                                  |
+| ------ | -------------------- | ------------- | ------------------------------------------------------------ |
+| src    | ftpComm.py           | python 3.7 +  | The main FTP communication module includes the FTP server and client. |
+| src    | ftpTestcaseClient.py | python 3.7 +  | Test case module for <ftpComm.py>, this module will start a ftp  test client use the test data set in ftpClient_data folder. |
+| src    | ftpTestcaseServer.py | python 3.7 +  | Test case module for <ftpComm.py>, this module will start a ftp test server use the test data set in ftpServer_data folder. |
+| src    | ftpClient_data/*     |               | FTP client test case data set.                               |
+| src    | ftpServer_data/*     |               | FTP client test case data set.                               |
+
+
+
+| Folder      | Program File              | Execution Env | Description                                  |
+| ----------- | ------------------------- | ------------- | -------------------------------------------- |
+| logArchiver | AgentLogFolder/*.txt      |               | Log archive agent test case data set.        |
+| logArchiver | ServerLogSorage/*.txt     |               | Log archive server test case data set.       |
+| logArchiver | templates/*.html          | HTML          | Log archive server web interface html pages. |
+| logArchiver | AgentConfig_template.txt  | txt           | Agent config file template.                  |
+| logArchiver | ConfigLoader.py           | python 3.7 +  | Config file loading module.                  |
+| logArchiver | logArchiveAgent.py        | python 3.7 +  | Log archive agent main program.              |
+| logArchiver | logArchiveServer.py       | python 3.7 +  | Log archive server main program.             |
+| logArchiver | ServerConfig_template.txt |               | Server config file template.                 |
+| logArchiver | uploadRcd.json            | JSON          | Uploaded file record file.                   |
+| logArchiver | userRecord.json           | JSON          | User record file.                            |
+
+
+
+
+
+------
+
+### System Usage
+
+##### Usage of FTP Comm Lib
+
+To use the FTO communication lib in your program, please follow the test case program `ftpTestcaseClient.py` and `ftpTestcaseServer.py`
+
+##### Usage of Log Archive Server
+
+Change the `ServerConfig_template.txt` to `ServerConfig.txt` then follow the comments in it to set the parameters as shown the example below:
+
+```
+# This is the config file template for the module <logArchiveServer.py>
+# Setup the parameter with below format (every line follows <key>:<val> format, the
+# key can not be changed):
+
+#-----------------------------------------------------------------------------
+# Init the FTP server parameters
+FTP_SER_PORT:8081
+# default max speed for client download: 300 Kb/sec (30 * 1024)
+MAX_UPLOAD_SPEED:307200
+# default max speed for client upload:  300 Kb/sec (30 * 1024)
+MAX_DOWNLOAD_SPEED:307200
+
+#-----------------------------------------------------------------------------
+# User record json file, need to put in same folder with the logArchiveServer.py
+USER_RCD:userRecord.json
+
+#-----------------------------------------------------------------------------
+# FTP storage root folder 
+LOG_DIR:ServerLogSorage
+LOG_PF:.txt
+
+#-----------------------------------------------------------------------------
+# Init the Flask app parameters
+FLASK_SER_PORT:5000
+FLASK_DEBUG_MD:False
+FLASK_MULTI_TH:True
+```
+
+Then add a valid user in the userRcd.json file and set the permission (refer to the design of Log Archive server side permission config), as shown the example below:
+
+```json
+{
+    "admin": {
+        "passwd": "******",
+        "perm": "elradfmwM"
+    },
+    "agent": {
+        "passwd": "******",
+        "perm": "elr"
+    }
+}
+
+```
+
+Run the server program:
+
+```
+python3 logArchiveServer.py
+```
+
+
+
+##### Usage of Log Archive Agent
+
+Change the `AgentConfig_template.txt` to `AgentConfig.txt` then follow the comments in it to set the parameters as shown the example below:
+

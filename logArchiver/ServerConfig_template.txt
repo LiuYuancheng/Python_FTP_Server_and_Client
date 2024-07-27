@@ -1,5 +1,5 @@
 # This is the config file template for the module <logArchiveServer.py>
-# Setup the paramter with below format (every line follows <key>:<val> format, the
+# Setup the parameter with below format (every line follows <key>:<val> format, the
 # key can not be changed):
 
 #-----------------------------------------------------------------------------
