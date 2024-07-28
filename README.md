@@ -4,11 +4,13 @@
 
 ![](doc/img/title.png)
 
-**Program Design Purpose**: This project aims to create an FTP server&client lib program for file transfer and a Log files synchronization system for log data archiving. We will develop an automated log file archive system that regularly collects newly generated log files from multiple nodes in a computer cluster and saves them on a central log file historian server. Additionally, a web interface will be provided on the log file historian server to allow users to access and review the archived logs.
+` Figure-00: Distributed Log File Automated Archive System Overview Diagram, version v1.3 (2024)`
+
+**Program Design Purpose**: This project aims to create an FTP server&client lib program for file transfer and a files management system for log data synchronization. We will develop an automated log file archive system that regularly collects newly generated log files from multiple nodes in a computer cluster and saves them on a central log file historian server. Additionally, a web interface will be provided on the log file historian server to allow users to access and review the archived logs.
 
 ```
 # Created:     2024/07/23
-# Version:     v_0.1.1
+# Version:     v_0.1.2
 # Copyright:   Copyright (c) 2024 LiuYuancheng
 # License:     MIT License
 ```
@@ -16,6 +18,26 @@
 **Table of Contents**
 
 [TOC]
+
+- [Python_FTP_Server_and_Client](#python-ftp-server-and-client)
+    + [Distributed Log File Automated Archive System](#distributed-log-file-automated-archive-system)
+    + [Introduction](#introduction)
+    + [System Design](#system-design)
+      - [Design of FTP Comm Library](#design-of-ftp-comm-library)
+      - [Design of Log Archive Agent](#design-of-log-archive-agent)
+      - [Design of Log Archive Server](#design-of-log-archive-server)
+    + [System Setup](#system-setup)
+        * [Development Environment](#development-environment)
+        * [Additional Lib/Software Need](#additional-lib-software-need)
+        * [Hardware Needed : None](#hardware-needed---none)
+        * [Program Files List](#program-files-list)
+    + [System Usage](#system-usage)
+        * [Usage of FTP Comm Lib](#usage-of-ftp-comm-lib)
+        * [Usage of Log Archive Server](#usage-of-log-archive-server)
+        * [Usage of Log Archive Agent](#usage-of-log-archive-agent)
+        * [View Logs Contents From Web UI](#view-logs-contents-from-web-ui)
+    + [Reference](#reference)
+    + [Problem and Solution](#problem-and-solution)
 
 ------
 
@@ -31,7 +53,9 @@ The system work flow diagram is shown below:
 
 ![](doc/img/workflow.png)
 
-To check the system usage demo, please refer to this video: 
+` Figure-01: Distributed Log File Automated Archive System Workflow Diagram, version v1.1 (2024)`
+
+To check the system usage demo, please refer to this video: https://youtu.be/5sTpMhQzxgU?si=slUAC8F-jJRHXE_M
 
 
 
@@ -153,8 +177,6 @@ In the server side user permission config please follow below permission char se
 
 
 
-
-
 ------
 
 ### System Usage
@@ -162,6 +184,24 @@ In the server side user permission config please follow below permission char se
 ##### Usage of FTP Comm Lib
 
 To use the FTO communication lib in your program, please follow the test case program `ftpTestcaseClient.py` and `ftpTestcaseServer.py`
+
+To integrate the Log archive service in your program and init:
+
+```
+dir = os.path.join(dirpath, 'ftpServer_data')
+server = ftpComm.ftpServer(dir, port=8081, threadFlg=True)
+server.addUser('client1', '123456')
+server.startServer()
+```
+
+To integrate the log archive client to in your program and init:
+
+```
+client = ftpComm.ftpClient('127.0.0.1', 8081, 'client1', '123456')
+client.connectToServer()
+```
+
+
 
 ##### Usage of Log Archive Server
 
@@ -209,7 +249,6 @@ Then add a valid user in the `userRcd.json` file and set the permission (refer t
         "perm": "elr"
     }
 }
-
 ```
 
 Run the server program:
@@ -264,11 +303,13 @@ python logAchiveAgent.py
 
 
 
-##### View Log from Web UI
+##### View Logs Contents From Web UI
 
 To view the archived log file in the server, type in the URL `http://<webhost_IPaddress>:5000` to view the web interface and download the log files:
 
 ![](doc/img/webUI.png)
+
+` Figure-02: Distributed Log File Automated Archive System WebUI screen shot, version v1.3 (2024)`
 
 ------
 
@@ -280,7 +321,8 @@ To view the archived log file in the server, type in the URL `http://<webhost_IP
 
 ### Problem and Solution
 
-Refer to `doc/ProblemAndSolution.md`
+- Refer to `doc/ProblemAndSolution.md`
+
 
 ------
 
