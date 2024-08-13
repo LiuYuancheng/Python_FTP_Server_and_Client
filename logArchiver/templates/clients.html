@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <title> Log Directory Viewer</title>
+    <style>
+        .fixed-header {
+            position: fixed;
+            margin: 0;
+            top: 0;
+            height: 40px;
+            width: 100%;
+            background-color: white;
+            padding: 10px 16px;
+            colour: black;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        div.content {
+            padding-top: 10px;
+            padding-left: 15px;
+            padding-right: 15px;
+            margin-top: 60px;
+        }
+        table {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            padding: 5px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        tr {
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+
+<h1 class="fixed-header"> Log Directory Viewer </h1>
+<hr>
+
+<div class="content">
+    <h3 style="display: inline;"> FTP Client connections: {{ clients|length }}</h3>
+    <span style="display: inline; margin-left: 10px;">
+        [<a href="/">Back to file viewer</a>]
+    </span>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>IP Address</th>
+                <th>Port</th>
+                <th>Connection Datetime</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                {% for client in clients %}
+                    <tr>
+                        <td>{{ client.ip }}</td>
+                        <td>{{ client.port }}</td>
+                        <td>{{ client.datetime }}</td>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function fetchClients() {
+        fetch('/api/clients')
+            .then(response => response.json())
+            .then(data => {
+                const clientsList = document.getElementById('clients-table-body');
+                const clientCount = document.getElementById('client-count');
+                clientsList.innerHTML = ''; // Clear the existing table body
+                data.clients.forEach(client => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${client.ip}</td>
+                        <td>${client.port}</td>
+                        <td>${client.datetime}</td>
+                    `;
+                    clientsList.appendChild(row);
+                });
+                clientCount.textContent = data.clients.length;
+            })
+            .catch(error => console.error('Error fetching clients:', error));
+    }
+
+    // Fetch clients every 5 seconds
+    setInterval(fetchClients, 5000);
+
+    // Fetch clients on initial load
+    window.onload = fetchClients;
+</script>
+
+</body>
+</html>
