@@ -3,7 +3,7 @@
 # Name:        ftpComm.py
 #
 # Purpose:     This lib module will provide FTP Communication client and server
-#              class for integrate in other program for file trafer.
+#              class for integrate in other program for file transfer.
 # 
 # Author:      Yuancheng Liu
 #
@@ -12,15 +12,16 @@
 # Copyright:   Copyright (c) 2024 LiuYuancheng
 # License:     MIT License
 #-----------------------------------------------------------------------------
-""" Liborary Design:
+""" Library Design:
 
     This lib module will provide FTP Communication client and server class for 
-    integrate in other program for file trafer.
+    integrate in other program for file transfer.
     - The server will use the pyftpdlib: https://pypi.org/project/pyftpdlib/
     - The client will use the ftplib: https://docs.python.org/3/library/ftplib.html
 """
 
 import os
+import time
 from ftplib import FTP
 from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler, ThrottledDTPHandler
@@ -56,6 +57,30 @@ DEF_READ_MAX_SPEED = 300 * 1024  # 300 Kb/sec (30 * 1024)
 # default max speed for client upload
 DEF_WRITE_MAX_SPEED = 300 * 1024  # 300 Kb/sec (30 * 1024)
 
+clients_info = []
+
+
+class CustomFTPHandler(FTPHandler):
+    def on_connect(self):
+        client = {
+            'ip': self.remote_ip,
+            'port': self.remote_port,
+            'datetime': time.strftime('%Y-%m-%d %H:%M:%S',  time.localtime(self.started)),
+        }
+        clients_info.append(client)
+        print(f"Client connected from {self.remote_ip}:{self.remote_port} at {client['datetime']}. "
+              f"Total clients connected: {len(clients_info)}")
+
+    def on_disconnect(self):
+        for client in clients_info:
+            if client['ip'] == self.remote_ip and client['port'] == self.remote_port:
+                clients_info.remove(client)
+                break
+        print(f"Client disconnected from {self.remote_ip}:{self.remote_port}. "
+              f"Total clients connected: {len(clients_info)}")
+        pass
+
+
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class ftpServer(object):
@@ -67,9 +92,9 @@ class ftpServer(object):
             ftpServer('/', port=8081, userDict={'user':{'passwd':'123456','perm':ftpComm.DEF_FTP_PORT,'dirpath':'/home/user'}},
                 readMaxSp=100000, writeMaxSp=100000,)
         Args:
-            rootDirPath (str): The FTP host file storage root foler.
+            rootDirPath (str): The FTP host file storage root folder.
             port (int, optional): FTP server port. Defaults to DEF_FTP_PORT.
-            userDict (dict, optional): Avaliable user dictionary. Defaults to DEF_USER.
+            userDict (dict, optional): Available user dictionary. Defaults to DEF_USER.
             readMaxSp (int, optional): FTP client max allowed download speed(Kb). Defaults to DEF_READ_MAX_SPEED.
             writeMaxSp (_type_, optional): FTP client max allowed upload speed(Kb). Defaults to DEF_WRITE_MAX_SPEED.
             threadFlg (bool, optional): flag to identify whether can run the server in subthread. Defaults to False.
@@ -85,13 +110,13 @@ class ftpServer(object):
         self.authorizer = DummyAuthorizer()
         self._initAuthorization()
         
-        # Initiate the throttled DTP handler class for uplad/download speed control
+        # Initiate the throttled DTP handler class for upload/download speed control
         self.dtphandler = ThrottledDTPHandler
         self.dtphandler.read_limit = int(readMaxSp)
         self.dtphandler.write_limit = int(writeMaxSp)
 
         # Instantiate FTP handler class
-        self.handler = FTPHandler
+        self.handler = CustomFTPHandler
         self.handler.authorizer = self.authorizer
         self.handler.dtp_handler = self.dtphandler
 
@@ -275,7 +300,7 @@ def main():
         client = ftpClient(serverIP, serverPort, userName, password)
         client.connectToServer()
         while True:
-            print("Input the program you want to run:[0]Swith to Dir [1]Upload [2]Download [3]List dir [4]exit")
+            print("Input the program you want to run:[0]Switch to Dir [1]Upload [2]Download [3]List dir [4]exit")
             choice = int(input())
             if choice == 0:
                 dir = input("Input dir:")
