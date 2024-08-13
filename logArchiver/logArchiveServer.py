@@ -82,6 +82,8 @@ def show_directory(subpath=''):
     subpathList = subpath.split('/')
     current_path = None
     # remove the duplicate in the path sub path.
+    clients = ftpComm.clients_info
+    agents = [d for d in os.listdir(ROOT_DIR) if os.path.isdir(os.path.join(ROOT_DIR, d))]
     for i in range(len(subpathList)):
         testSubpath = slashCar.join(subpathList[i:])
         testPath = os.path.join(ROOT_DIR, testSubpath)
@@ -94,14 +96,23 @@ def show_directory(subpath=''):
     if os.path.isdir(current_path):
         # List directory contents
         contents = os.listdir(current_path)
-        print(contents)
-        directories = [d for d in contents if os.path.isdir(os.path.join(current_path, d))]
+        # print(contents)
+        directories = {d: os.listdir(os.path.join(current_path, d))
+                       for d in contents if
+                       os.path.isdir(os.path.join(current_path, d))}
         files = [f for f in contents if os.path.isfile(os.path.join(current_path, f))]
         #print(files)
-        return render_template('index.html', subpath=subpath, directories=directories, files=files)
+        return render_template('index.html', clients=clients, agents=agents,
+                               subpath=subpath, directories=directories, files=files)
     else:
         # Serve a file
         return send_from_directory(ROOT_DIR, subpath)
+
+@app.route('/clients')
+def show_clients():
+    clients = ftpComm.clients_info
+    return render_template('clients.html', clients=clients)
+
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
