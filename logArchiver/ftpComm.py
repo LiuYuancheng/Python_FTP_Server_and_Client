@@ -5,7 +5,7 @@
 # Purpose:     This lib module will provide FTP Communication client and server
 #              class for integrate in other program for file transfer.
 # 
-# Author:      Yuancheng Liu
+# Author:      Yuancheng Liu, Sandy Seah
 #
 # Created:     2024/07/23
 # Version:     v_0.1.1
@@ -57,37 +57,13 @@ DEF_READ_MAX_SPEED = 300 * 1024  # 300 Kb/sec (30 * 1024)
 # default max speed for client upload
 DEF_WRITE_MAX_SPEED = 300 * 1024  # 300 Kb/sec (30 * 1024)
 
-clients_info = []
-
-
-class CustomFTPHandler(FTPHandler):
-    def on_connect(self):
-        client = {
-            'ip': self.remote_ip,
-            'port': self.remote_port,
-            'datetime': time.strftime('%Y-%m-%d %H:%M:%S',  time.localtime(self.started)),
-        }
-        clients_info.append(client)
-        print(f"Client connected from {self.remote_ip}:{self.remote_port} at {client['datetime']}. "
-              f"Total clients connected: {len(clients_info)}")
-
-    def on_disconnect(self):
-        for client in clients_info:
-            if client['ip'] == self.remote_ip and client['port'] == self.remote_port:
-                clients_info.remove(client)
-                break
-        print(f"Client disconnected from {self.remote_ip}:{self.remote_port}. "
-              f"Total clients connected: {len(clients_info)}")
-        pass
-
-
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class ftpServer(object):
     """ FTP server class."""
     def __init__(self, rootDirPath, port=DEF_FTP_PORT, userDict=DEF_USER,
                  readMaxSp=DEF_READ_MAX_SPEED, writeMaxSp=DEF_WRITE_MAX_SPEED,
-                 threadFlg=False):
+                 ftpHandler=None, threadFlg=False):
         """ Init example:
             ftpServer('/', port=8081, userDict={'user':{'passwd':'123456','perm':ftpComm.DEF_FTP_PORT,'dirpath':'/home/user'}},
                 readMaxSp=100000, writeMaxSp=100000,)
@@ -116,7 +92,7 @@ class ftpServer(object):
         self.dtphandler.write_limit = int(writeMaxSp)
 
         # Instantiate FTP handler class
-        self.handler = CustomFTPHandler
+        self.handler = FTPHandler if ftpHandler is None else ftpHandler
         self.handler.authorizer = self.authorizer
         self.handler.dtp_handler = self.dtphandler
 
