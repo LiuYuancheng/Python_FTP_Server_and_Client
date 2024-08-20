@@ -6,16 +6,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <title> Log Directory Viewer</title>
     <style>
-        .directory-list {
+        .item-list {
             margin-top: 5px;
         }
-        .file-list {
-            margin-top: 5px;
-        }
-        .directory-list li {
-            margin-bottom: 5px;
-        }
-        .file-list li {
+        .item-list li {
             margin-bottom: 5px;
         }
         .tooltip {
@@ -45,22 +39,27 @@
             position: fixed;
             margin: 0;
             top: 0;
+            left: 0;
             height: 40px;
             width: 100%;
             background-color: white;
             padding: 10px 16px;
             color: black;
             box-shadow: 0 2px 5px #E6E6E6;
+            overflow: hidden;
+            white-space: nowrap;
         }
-        div.content {
+        .content {
             padding: 10px 15px 0 15px;
             margin: 60px 0 0 150px;
+            white-space: nowrap;
         }
         .sidebar {
             position: fixed;
             margin-top: 60px;
             top: 0;
             bottom: 0;
+            left: 0;
             width: 150px;
             background-color: #F1F1F1;
             overflow-y: auto;
@@ -70,6 +69,7 @@
             display: block;
             color: black;
             padding: 16px;
+            font-size: 16px;
             text-decoration: none;
         }
         .sidebar a.active {
@@ -82,6 +82,7 @@
         }
         .search-input {
             display: inline-block;
+            vertical-align: top;
             height: 18px;
             width: 200px;
             font-size: 12px;
@@ -90,8 +91,14 @@
             border-radius: 8px;
             margin-left: 10px
         }
-        div.info-search = {
-            margin: 5px 0 10px 0;
+        .info-search {
+            padding: 5px 0;
+            margin: 5px 0;
+        }
+        h2 {
+            display: inline-block;
+            height: 28px;
+            margin: 5px 0;;
         }
     </style>
 </head>
@@ -135,8 +142,8 @@
     </p>
 
     <div class="info-search">
-        <h2 style="display: inline; margin-bottom: 5px;">Folders in current directory: {{ directories|length }}</h2>
-        {% if directories %}
+        <h2>Folders in current directory: {{ directories|length }}</h2>
+        {% if directories|length > 10 %}
         <input type="text" id="directory-input" class="search-input" onkeyup="filterLists()"
                placeholder="Find folder in the current directory...">
         {% endif %}
@@ -144,7 +151,7 @@
 
     <div class="directory-section">
         {% if directories %}
-            <ul id="directory-ul" class="directory-list">
+            <ul id="directory-ul" class="item-list">
                 {% for directory, content in directories.items() %}
                     <li> <a href="{{ subpath }}/{{ directory }}"
                             data-bs-toggle="tooltip" data-bs-placement="right"
@@ -161,8 +168,8 @@
 
 
     <div class="info-search">
-        <h2 style="display: inline; margin-bottom: 5px;">Files in current directory: {{ files|length }}</h2>
-        {% if files %}
+        <h2>Files in current directory: {{ files|length }}</h2>
+        {% if files|length > 10 %}
         <input type="text" id="file-input" class="search-input" onkeyup="filterLists()"
                placeholder="Find file in the current directory...">
         {% endif %}
@@ -170,7 +177,7 @@
 
     <div class="file-section">
         {% if files %}
-            <ul id="file-ul" class="file-list">
+            <ul id="file-ul" class="item-list">
                 {% for file in files %}
                     <li><a href="{{ subpath }}/{{ file }}">{{ file }}</a></li>
                 {% endfor %}
@@ -191,33 +198,36 @@
 
     function filterLists() {
         var input1 = document.getElementById("directory-input");
-        var filter1 = input1.value.toUpperCase();
-        var ul1 = document.getElementById("directory-ul");
-        var li1 = ul1.getElementsByTagName("li");
+        if (input1) {
+            var filter1 = input1.value.toUpperCase();
+            var ul1 = document.getElementById("directory-ul");
+            var li1 = ul1.getElementsByTagName("li");
 
-        for (var i = 0; i < li1.length; i++) {
-            var a1 = li1[i].getElementsByTagName("a")[0];
-            var txtValue1 = a1.textContent || a1.innerText;
-            if (txtValue1.toUpperCase().indexOf(filter1) > -1) {
-                li1[i].style.display = "";
-            } else {
-                li1[i].style.display = "none";
+            for (var i = 0; i < li1.length; i++) {
+                var a1 = li1[i].getElementsByTagName("a")[0];
+                var txtValue1 = a1.textContent || a1.innerText;
+                if (txtValue1.toUpperCase().indexOf(filter1) > -1) {
+                    li1[i].style.display = "";
+                } else {
+                    li1[i].style.display = "none";
+                }
             }
         }
 
-        // Second input and its associated list
         var input2 = document.getElementById("file-input");
-        var filter2 = input2.value.toUpperCase();
-        var ul2 = document.getElementById("myUL2");
-        var li2 = ul2.getElementsByTagName("li");
+        if (input2) {
+            var filter2 = input2.value.toUpperCase();
+            var ul2 = document.getElementById("file-ul");
+            var li2 = ul2.getElementsByTagName("li");
 
-        for (var j = 0; j < li2.length; j++) {
-            var a2 = li2[j].getElementsByTagName("a")[0];
-            var txtValue2 = a2.textContent || a2.innerText;
-            if (txtValue2.toUpperCase().indexOf(filter2) > -1) {
-                li2[j].style.display = "";
-            } else {
-                li2[j].style.display = "none";
+            for (var j = 0; j < li2.length; j++) {
+                var a2 = li2[j].getElementsByTagName("a")[0];
+                var txtValue2 = a2.textContent || a2.innerText;
+                if (txtValue2.toUpperCase().indexOf(filter2) > -1) {
+                    li2[j].style.display = "";
+                } else {
+                    li2[j].style.display = "none";
+                }
             }
         }
     }
