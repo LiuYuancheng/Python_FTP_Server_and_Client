@@ -1,0 +1,78 @@
+{% extends 'mgmbase.html' %}
+
+{% block title %} Node Agent Client Infomation {% endblock %}
+
+{% block style%} <style></style> {% endblock %}
+
+{% block mgmContent %}
+    <ul class="list-group">
+        <li class="list-group-item">
+            <h3> Log Agents Information</h3>
+            <p></p>
+            <table class="table table-dark table-bordered">
+                <thead>
+                    <tr class="table-primary">
+                        <th>Agent ID</th>
+                        <th>Agent IP</th>
+                        <th>Login User Name</th>
+                        <th>Log Upload Interval</th>
+                        <th>Total LogFile Size</th>
+                        <th>Link to Agent Page</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for post in posts['agentsInfo'] %}
+                        <tr>
+                            <td>{{ post['ID'] }}</td>
+                            <td>{{ post['IP'] }}</td>
+                            <td>{{ post['LoginUserName']}}</td>
+                            <td> Every {{ post['UploadInv'] }} seconds</td>
+                            <td> </td>
+                            <td><a href="/agent/{{ post['ID'] }}" target="_blank">Link to Agent Page</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </li>
+    </ul>
+
+<!-- jstree css -->
+<link href="assets/vendor/jstree/themes/default/style.min.css" rel="stylesheet" type="text/css">
+
+                                               
+                                                                                
+<div id="jstree-1">
+    <ul>
+        <li>
+            Root node 1
+            <ul>
+                <li data-jstree='{ "selected" : true }'>
+                    <a href="javascript:;">
+                    Initially selected </a>
+                </li>
+                <li data-jstree='{ "icon" : "ri-home-4-line text-success " }'>
+                    custom icon URL
+                </li>
+                <li data-jstree='{ "opened" : true }'>
+                    initially open
+                    <ul>
+                        <li data-jstree='{ "disabled" : true }'>
+                            Disabled Node
+                        </li>
+                        <li data-jstree='{ "type" : "file" }'>
+                            Another node
+                        </li>
+                    </ul>
+                </li>
+                <li data-jstree='{ "icon" : "ri-vip-diamond-line text-danger" }'>
+                    Custom icon class (bootstrap)
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>
+
+                                                
+Custom Icons & Clickable Nodes
+    
+{% endblock %}

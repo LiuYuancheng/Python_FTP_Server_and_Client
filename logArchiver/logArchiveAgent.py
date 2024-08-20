@@ -191,7 +191,19 @@ class LogAchiveAgent():
             return False 
 
     #-----------------------------------------------------------------------------
+    def uploadOwnConfig(self):
+        """ Upload the agent's config file to the FTP server's agent own folder."""
+        self.switchToHome()
+
+        fileList = self.client.listDirInfo(detail=False)
+        if not CONFIG_FILE_NAME in fileList:
+            print("uploadOwnConfig()> uploaded the own log file to the server side.")
+            self.client.uploadFile(gGonfigPath, CONFIG_FILE_NAME)
+
+    #-----------------------------------------------------------------------------
     def run(self):
+        """ The log file upload main loop."""
+        self.uploadOwnConfig()
         print("LogAchiveAgent[ID=%s]: start log archive main loop" %self.agentID)
         while not self.terminate:
             logfileList = self.getNewUploadFiles()

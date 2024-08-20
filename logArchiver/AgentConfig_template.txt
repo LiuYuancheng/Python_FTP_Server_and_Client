@@ -5,6 +5,7 @@
 #-----------------------------------------------------------------------------
 # Unique Agent ID, all the log file will be saved in the server's home/<AGENT_ID>/ folder
 AGENT_ID:Test
+AGENT_IP:127.0.0.1
 
 #-----------------------------------------------------------------------------
 # FTP server info and login credentials, don't uplaod the credentials to the Github
