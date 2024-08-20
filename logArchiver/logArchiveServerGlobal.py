@@ -40,6 +40,7 @@ CONFIG_DICT = iConfigLoader.getJson()
 
 ROOT_DIR = os.path.join(dirpath, CONFIG_DICT['LOG_DIR'])
 
+gTestMD = CONFIG_DICT['TEST_MODE']
 
 iFTPservice = None
 iDataMgr = None

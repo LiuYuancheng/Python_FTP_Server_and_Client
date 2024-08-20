@@ -21,10 +21,11 @@
     <li class="list-group-item">
         <h3> Service Infomation </h3>
 
-        <table class="table table-bordered">
+        <table class="table table-dark table-bordered">
             <thead>
             <tr>
                 <th>FTP Serviec Port</th>
+                <th>Log Root Directory</th>
                 <th>Log Max Upload speed</th>
                 <th>Current Agents Number</th>
                 <th>Current Log Size</th>
@@ -33,9 +34,10 @@
             <tbody>
             <tr>
                 <td>{{posts['FTPport']}}</td>
+                <td> <span class="badge bg-secondary">{{posts['rootDir']}}</span></td>
                 <td>{{posts['nodeUploadMax']}} Kb/sec</td>
                 <td>{{posts['nodeNum']}}</td>
-                <td>{{posts['nodeUploadMax']/1024/1024 }} Mb</td>
+                <td>{{posts['nodeUploadMax']/1024 }} Mb</td>
             </tr>
             </tbody>
         </table>

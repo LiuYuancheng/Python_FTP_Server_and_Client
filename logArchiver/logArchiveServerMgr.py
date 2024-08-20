@@ -47,7 +47,8 @@ class dataManager(object):
         folderList = [d for d in os.listdir(gv.ROOT_DIR) if os.path.isdir(os.path.join(gv.ROOT_DIR, d))]
         folderSize = os.path.getsize(gv.ROOT_DIR)
         storageData = {
-            "FTPport": int(gv.CONFIG_DICT['FTP_SER_PORT']), 
+            "FTPport": int(gv.CONFIG_DICT['FTP_SER_PORT']),
+            "rootDir": gv.ROOT_DIR,
             "nodeUploadMax": int(gv.CONFIG_DICT['MAX_UPLOAD_SPEED'])/1024,
             "totalSize": int(folderSize),
             "nodeNum": len(folderList)

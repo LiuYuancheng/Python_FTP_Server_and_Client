@@ -23,7 +23,7 @@
                 <tbody>
                     {% for post in posts['agentsInfo'] %}
                         <tr>
-                            <td>{{ post['ID'] }}</td>
+                            <td> <span class="badge bg-primary"> {{ post['ID'] }} </span> </td>
                             <td>{{ post['IP'] }}</td>
                             <td>{{ post['LoginUserName']}}</td>
                             <td> Every {{ post['UploadInv'] }} seconds</td>
@@ -35,44 +35,5 @@
             </table>
         </li>
     </ul>
-
-<!-- jstree css -->
-<link href="assets/vendor/jstree/themes/default/style.min.css" rel="stylesheet" type="text/css">
-
-                                               
-                                                                                
-<div id="jstree-1">
-    <ul>
-        <li>
-            Root node 1
-            <ul>
-                <li data-jstree='{ "selected" : true }'>
-                    <a href="javascript:;">
-                    Initially selected </a>
-                </li>
-                <li data-jstree='{ "icon" : "ri-home-4-line text-success " }'>
-                    custom icon URL
-                </li>
-                <li data-jstree='{ "opened" : true }'>
-                    initially open
-                    <ul>
-                        <li data-jstree='{ "disabled" : true }'>
-                            Disabled Node
-                        </li>
-                        <li data-jstree='{ "type" : "file" }'>
-                            Another node
-                        </li>
-                    </ul>
-                </li>
-                <li data-jstree='{ "icon" : "ri-vip-diamond-line text-danger" }'>
-                    Custom icon class (bootstrap)
-                </li>
-            </ul>
-        </li>
-    </ul>
-</div>
-
-                                                
-Custom Icons & Clickable Nodes
     
 {% endblock %}

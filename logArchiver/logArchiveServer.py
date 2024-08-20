@@ -18,6 +18,7 @@ import os
 import time
 import platform
 from flask import Flask, render_template, send_from_directory, abort
+from directory_tree import DisplayTree
 
 import logArchiveServerGlobal as gv
 import logArchiveServerMgr as mgr
@@ -74,12 +75,14 @@ def show_directory(subpath=''):
         # List directory contents
         contents = os.listdir(current_path)
         # print(contents)
-        directories = {d: os.listdir(os.path.join(current_path, d))
+        directories = {d: DisplayTree(os.path.join(current_path, d), stringRep=True, showHidden=True, maxDepth=2).replace('\n', '<br>')
                        for d in contents if
                        os.path.isdir(os.path.join(current_path, d))}
+                
         files = [f for f in contents if os.path.isfile(os.path.join(current_path, f))]
         #print(files)
-        return render_template('agents.html', clients=clients, agents=agents,
+        posts = {'page': 2}
+        return render_template('agents.html', posts=posts, clients=clients, agents=agents,
                                subpath=subpath, directories=directories, files=files)
     else:
         # Serve a file

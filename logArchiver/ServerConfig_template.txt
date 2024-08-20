@@ -3,6 +3,10 @@
 # key can not be changed):
 
 #-----------------------------------------------------------------------------
+# Web test mode flag: True start without init the FTP server
+TEST_MD:True
+
+#-----------------------------------------------------------------------------
 # Init the FTP server paramters
 FTP_SER_PORT:8081
 # default max speed for client download: 300 Kb/sec (30 * 1024)
