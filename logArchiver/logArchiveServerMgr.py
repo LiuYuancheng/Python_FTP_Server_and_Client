@@ -14,8 +14,11 @@
 #-----------------------------------------------------------------------------
 
 import os
+import time
+
 import threading
 from pyftpdlib.handlers import FTPHandler
+from directory_tree import DisplayTree
 
 import ftpComm
 import ConfigLoader
@@ -39,7 +42,7 @@ class dataManager(object):
         print(folderList)
         for agentID in folderList:
             if not (agentID in self.agentConfigInfo.keys()):
-                self.agentConfigInfo[agentID] = self.getAgentInfo(agentID)
+                self.agentConfigInfo[agentID] = self.createAgentInfo(agentID)
         return self.agentConfigInfo
 
     #-----------------------------------------------------------------------------
@@ -56,12 +59,13 @@ class dataManager(object):
         return storageData
     
     #-----------------------------------------------------------------------------
-    def getAgentInfo(self, agentName):
+    def createAgentInfo(self, agentName):
         agentData = {
             'ID': None,
             'IP': None,
             'LoginUserName' : None,
             'UploadInv' : None,
+            'Dirtree': None
         }
         agentDirPath = os.path.join(gv.ROOT_DIR, agentName)
         if os.path.isdir(agentDirPath):
@@ -74,7 +78,21 @@ class dataManager(object):
                 agentData['IP'] = dataDict['AGENT_IP']
                 agentData['LoginUserName'] = dataDict['USER_NAME']
                 agentData['UploadInv'] = int(dataDict['UPLOAD_INV'])
+                agentData['Dirtree'] = DisplayTree(agentDirPath, stringRep=True, showHidden=True)
         return agentData
+
+    #-----------------------------------------------------------------------------
+    def updateAgentFileTree(self, agentName):
+        agentDirPath = os.path.join(gv.ROOT_DIR, agentName)
+        if os.path.isdir(agentDirPath):
+            self.agentConfigInfo[agentName]['Dirtree'] = DisplayTree(agentDirPath, stringRep=True, showHidden=True)
+
+    #-----------------------------------------------------------------------------
+    def getAgentInfo(self, agentName):
+        if agentName in self.agentConfigInfo.keys():
+            return self.agentConfigInfo[agentName]
+        else:
+            return self.createAgentInfo(agentName)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

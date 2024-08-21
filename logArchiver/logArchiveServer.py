@@ -15,7 +15,6 @@
 #-----------------------------------------------------------------------------
 
 import os
-import time
 import platform
 from flask import Flask, render_template, send_from_directory, abort
 from directory_tree import DisplayTree
@@ -47,20 +46,26 @@ def index():
     posts.update(serverData)
     return render_template('index.html', posts=posts)
 
+#-----------------------------------------------------------------------------
 @app.route('/agentview')
 def agentview():
     posts = {'page': 1}  # page index is used to highlight the left page slide bar.
     posts['agentsInfo'] = gv.iDataMgr.getAllAgentsInfo().values()
-    print(posts['agentsInfo'])
+    #print(posts['agentsInfo'])
     return render_template('agentview.html', posts=posts)
 
 #-----------------------------------------------------------------------------
 @app.route('/agent/<path:subpath>')
 def show_directory(subpath=''):
+    print(subpath)
     subpathList = subpath.split('/')
+    if '' in subpathList: subpathList.remove('')
+    if len(subpathList) == 0: abort(404)
+    agentName = str(subpathList[0])
+    if len(subpathList) == 1 and agentName:gv.iDataMgr.updateAgentFileTree(agentName)
+    agentInfo = gv.iDataMgr.getAgentInfo(agentName)
     current_path = None
     # remove the duplicate in the path sub path.
-    clients = mgr.clients_info
     agents = [d for d in os.listdir(gv.ROOT_DIR) if os.path.isdir(os.path.join(gv.ROOT_DIR, d))]
     for i in range(len(subpathList)):
         testSubpath = slashCar.join(subpathList[i:])
@@ -69,6 +74,7 @@ def show_directory(subpath=''):
             current_path = testPath
             subpath = '/'.join(subpathList[i:])
             break
+    
     if current_path is None: abort(404)
     print(current_path)
     if os.path.isdir(current_path):
@@ -77,22 +83,28 @@ def show_directory(subpath=''):
         # print(contents)
         directories = {d: DisplayTree(os.path.join(current_path, d), stringRep=True, showHidden=True, maxDepth=2).replace('\n', '<br>')
                        for d in contents if
-                       os.path.isdir(os.path.join(current_path, d))}
-                
+                       os.path.isdir(os.path.join(current_path, d))}  
         files = [f for f in contents if os.path.isfile(os.path.join(current_path, f))]
         #print(files)
-        posts = {'page': 2}
-        return render_template('agents.html', posts=posts, clients=clients, agents=agents,
-                               subpath=subpath, directories=directories, files=files)
+        currentPath = current_path.replace(gv.ROOT_DIR, '')
+        if currentPath.startswith(slashCar): currentPath = currentPath[1:]
+        posts = {
+                 'page': 2,
+                 'agentInfoDict': agentInfo,
+                 'crtPathStr': currentPath.replace(slashCar, '/'),
+                 'dirDict': directories,
+                 'filesList': files
+                 }
+        return render_template('agents.html', posts=posts)
     else:
         # Serve a file
         return send_from_directory(gv.ROOT_DIR, subpath)
 
 @app.route('/clients')
-def show_clients():
-    clients = mgr.clients_info
-    return render_template('clients.html', clients=clients)
-
+def clients():
+    posts = {'page': 3}
+    posts['clients'] = mgr.clients_info
+    return render_template('clients.html', posts=posts)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

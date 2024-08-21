@@ -35,98 +35,104 @@
 {% endblock %}
 
 {% block mgmContent %}
+    {% set agentInfo = posts['agentInfoDict'] %}
+    <ul class="list-group">
+        <li class="list-group-item">
+            <h3> Agent Log Directory Viewer </h3>
+            <p> </p>
+            <hr>
+            <p> <b> Agent ID: </b><span class="badge bg-primary"> {{ agentInfo['ID'] }}</span>
+                <b> Agent IP Address: </b> <span class="badge bg-secondary"> {{ agentInfo['IP'] }} </span>
+            </p>
+        </li>
 
+        <li class="list-group-item">
+            <div class="row">
 
-<ul class="list-group">
+                <div class="col-sm-6">
+                    <h5> Agent Directory Tree: </h5>
+                    <p> </p>   
+                    <textarea class="form-control" style="font-family: monospace;" rows="25" id="resultContents" name="resultContents", value=""> {{ agentInfo['Dirtree'] }}
+                    </textarea>
+                </div>
 
-    <li class="list-group-item">
+                <div class="col-sm-6">
+                    {% set subpath = posts['crtPathStr'] %}
+                    {% set directories = posts['dirDict'] %}
+                    {% set files = posts['filesList']%}
+                    <p>
+                        <h5 style="display: inline; margin-bottom: 10px"> Current working directory: </h5>
+                        <span style="display: inline; margin-left: 5px;">
+                            {% if subpath %}
+                                {% set ns = namespace(url="") %}
+                                {% set path_parts = subpath.split('/') %}
+                                <a href="/">Root</a>
+                                {% set ns.url = '/agent/' %}
+                                {% for part in path_parts %}
+                                    {% set ns.url = ns.url ~ '/' ~ part %}
+                                    {% if not loop.last %}
+                                        / <a href="{{ ns.url }}">{{ part }}</a>
+                                    {% else %}
+                                        / {{ part }}
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                Root
+                            {% endif %}
+                        </span>
+                    </p>
 
-
-    <h1 class="fixed-header"> Log Directory Viewer </h1>
-    <hr>
-
-    <div class="sidebar">
-        <a class="active" href="/">Agent Directories</a>
-        {% for agents in agents %}
-            <a href="/{{ agents }}">{{ agents }}</a>
-        {% endfor %}
-    </div>
-
-    <div class="content">
-        <h3 style="display: inline; margin-bottom: 10px"> FTP Client connections: {{ clients|length }}</h3>
-        <span style="display: inline; margin-left: 10px;">
-            [<a href="/clients">View client connections</a>]
-        </span>
-
-        <p>
-            <h3 style="display: inline; margin-bottom: 10px"> Current working directory: </h3>
-            <span style="display: inline; margin-left: 5px;">
-                {% if subpath %}
-                    {% set ns = namespace(url="") %}
-                    {% set path_parts = subpath.split('/') %}
-                    <a href="/">Root</a>
-                    {% for part in path_parts %}
-                        {% set ns.url = ns.url ~ 'agent/' ~ part %}
-                        {% if not loop.last %}
-                            / <a href="{{ ns.url }}">{{ part }}</a>
-                        {% else %}
-                            / {{ part }}
+                    <div class="info-search">
+                        <h5>Folders in current directory: {{ directories|length }}</h5>
+                        {% if directories|length > 10 %}
+                        <input type="text" id="directory-input" class="search-input" onkeyup="filterLists()"
+                            placeholder="Find folder in the current directory...">
                         {% endif %}
-                    {% endfor %}
-                {% else %}
-                    Root
-                {% endif %}
-            </span>
-        </p>
+                    </div>
 
-        <div class="info-search">
-            <h2>Folders in current directory: {{ directories|length }}</h2>
-            {% if directories|length > 10 %}
-            <input type="text" id="directory-input" class="search-input" onkeyup="filterLists()"
-                placeholder="Find folder in the current directory...">
-            {% endif %}
-        </div>
+                    <div class="directory-section">
+                        {% if directories %}
+                            <ul id="directory-ul" class="item-list">
+                                {% for directory, content in directories.items() %}
+                                    <li> <a href="{{ subpath }}/{{ directory }}"
+                                            data-bs-toggle="tooltip" data-bs-placement="right"
+                                            data-bs-html="true"
+                                            title="<p> {% autoescape false %} {{content}} {% endautoescape %}</p>">
+                                            {{ directory }} </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p style="margin: 15px 0 15px 20px">No sub-directories.</p>
+                        {% endif %}
+                    </div>
 
-        <div class="directory-section">
-            {% if directories %}
-                <ul id="directory-ul" class="item-list">
-                    {% for directory, content in directories.items() %}
-                        <li> <a href="{{ subpath }}/{{ directory }}"
-                                data-bs-toggle="tooltip" data-bs-placement="right"
-                                data-bs-html="true"
-                                title="<p> {% autoescape false %} {{content}} {% endautoescape %}</p>">
-                                {{ directory }} </a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p style="margin: 15px 0 15px 20px">No sub-directories.</p>
-            {% endif %}
-        </div>
+                    <div class="info-search">
+                        <h5>Files in current directory: {{ files|length }}</h5>
+                        {% if files|length > 10 %}
+                        <input type="text" id="file-input" class="form-control" onkeyup="filterLists()"
+                            placeholder="Find file in the current directory...">
+                        {% endif %}
+                    </div>
+
+                    <div class="file-section">
+                        {% if files %}
+                            <ul id="file-ul" class="item-list">
+                                {% for file in files %}
+                                    <li><a href="{{ subpath }}/{{ file }}" target="_blank">{{ file }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p style="margin: 15px 0 15px 20px">No files available.</p>
+                        {% endif %}
+                    </div>
+                </div>
+    
+            </div>
+        </li>
+    </ul>
 
 
-        <div class="info-search">
-            <h2>Files in current directory: {{ files|length }}</h2>
-            {% if files|length > 10 %}
-            <input type="text" id="file-input" class="search-input" onkeyup="filterLists()"
-                placeholder="Find file in the current directory...">
-            {% endif %}
-        </div>
-
-        <div class="file-section">
-            {% if files %}
-                <ul id="file-ul" class="item-list">
-                    {% for file in files %}
-                        <li><a href="{{ subpath }}/{{ file }}">{{ file }}</a></li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p style="margin: 15px 0 15px 20px">No files available.</p>
-            {% endif %}
-        </div>
-
-    </li>
-</ul>
     <script>
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {

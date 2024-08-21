@@ -1,76 +1,35 @@
-<!doctype html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <title> Log Directory Viewer</title>
-    <style>
-        .fixed-header {
-            position: fixed;
-            margin: 0;
-            top: 0;
-            height: 40px;
-            width: 100%;
-            background-color: white;
-            padding: 10px 16px;
-            colour: black;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        div.content {
-            padding-top: 10px;
-            padding-left: 15px;
-            padding-right: 15px;
-            margin-top: 60px;
-        }
-        table {
-            margin-top: 20px;
-            border-collapse: collapse;
-            width: 100%;
-        }
-        th, td {
-            padding: 5px;
-            text-align: left;
-            border: 1px solid #ddd;
-        }
-        tr {
-            border-bottom: 1px solid #ddd;
-        }
-    </style>
-</head>
-<body>
 
+{% extends 'mgmbase.html' %}
 
-<h1 class="fixed-header"> Log Directory Viewer </h1>
-<hr>
+{% block title %} FTP Client connections {% endblock %}
+{% block mgmContent %}
 
-<div class="content">
-    <h3 style="display: inline;"> FTP Client connections: {{ clients|length }}</h3>
-    <span style="display: inline; margin-left: 10px;">
-        [<a href="/">Back to file viewer</a>]
-    </span>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>IP Address</th>
-                <th>Port</th>
-                <th>Connection Datetime</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                {% for client in clients %}
+<ul class="list-group">
+    <li class="list-group-item"> 
+        <div class="content">
+            {% set clients = posts['clients']%}
+            <h3> FTP Client connections: {{ clients|length }}</h3>
+            <table class="table table-dark table-bordered">
+                <thead>
                     <tr>
-                        <td>{{ client.ip }}</td>
-                        <td>{{ client.port }}</td>
-                        <td>{{ client.datetime }}</td>
-                {% endfor %}
-            </tr>
-        </tbody>
-    </table>
-</div>
-
+                        <th>IP Address</th>
+                        <th>Port</th>
+                        <th>Connection Datetime</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in clients %}
+                        <tr>
+                            <td>{{ client.ip }}</td>
+                            <td>{{ client.port }}</td>
+                            <td>{{ client.datetime }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </li>
+</ul>
 <script>
     function fetchClients() {
         fetch('/api/clients')
@@ -100,5 +59,4 @@
     window.onload = fetchClients;
 </script>
 
-</body>
-</html>
+{% endblock %}
