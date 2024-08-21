@@ -1,18 +1,21 @@
 # This is the config file template for the module <logArchiveServer.py>
-# Setup the parameter with below format (every line follows <key>:<val> format, the
+# Setup the paramter with below format (every line follows <key>:<val> format, the
 # key can not be changed):
 
 #-----------------------------------------------------------------------------
 # Web test mode flag: True start without init the FTP server
-TEST_MD:True
+TEST_MODE:True
 
 #-----------------------------------------------------------------------------
 # Init the FTP server paramters
 FTP_SER_PORT:8081
-# default max speed for client download: 300 Kb/sec (30 * 1024)
+# default max speed for client download: 300 Kb/sec (300 * 1024)
 MAX_UPLOAD_SPEED:307200
-# default max speed for client upload:  300 Kb/sec (30 * 1024)
+# default max speed for client upload:  300 Kb/sec (300 * 1024)
 MAX_DOWNLOAD_SPEED:307200
+
+#
+LOG_FOLDER_CP:1000
 
 #-----------------------------------------------------------------------------
 # User record json file, need to put in same folder with the logArchiveServer.py

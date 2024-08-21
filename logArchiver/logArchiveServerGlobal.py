@@ -7,8 +7,8 @@
 #              
 # Author:      Yuancheng Liu
 #
-# Created:     2024/05/26
-# Version:     v_0.1.3
+# Created:     2024/08/21
+# Version:     v_0.1.1
 # Copyright:   Copyright (c) 2023 LiuYuancheng
 # License:     MIT License
 #-----------------------------------------------------------------------------
@@ -20,8 +20,6 @@ For good coding practice, follow the below naming convention:
 """
 
 import os
-import sys
-import json
 import ConfigLoader
 
 print("Current working directory is : %s" % os.getcwd())
@@ -29,6 +27,8 @@ DIR_PATH = dirpath = os.path.dirname(os.path.abspath(__file__))
 print("Current source code location : %s" % dirpath)
 APP_NAME = ('Log Archiver', 'Server')
 
+#-----------------------------------------------------------------------------
+# Init the configure file loader.
 #Load the agent config file 
 CONFIG_FILE_NAME = 'ServerConfig.txt'
 gGonfigPath = os.path.join(dirpath, CONFIG_FILE_NAME)
@@ -40,7 +40,11 @@ CONFIG_DICT = iConfigLoader.getJson()
 
 ROOT_DIR = os.path.join(dirpath, CONFIG_DICT['LOG_DIR'])
 
+#-------<GLOBAL VARIABLES (start with "g")>------------------------------------
+# VARIABLES are the built in data type.
 gTestMD = CONFIG_DICT['TEST_MODE']
+gClientInfo = []
 
+#-------<GLOBAL PARAMTERS>-----------------------------------------------------
 iFTPservice = None
 iDataMgr = None

@@ -9,7 +9,7 @@
 # Author:      Yuancheng Liu
 #
 # Created:     2024/07/25
-# Version:     v_0.0.1
+# Version:     v_0.1.1
 # Copyright:   Copyright (c) 2024 LiuYuancheng
 # License:     MIT License
 #-----------------------------------------------------------------------------
@@ -22,7 +22,6 @@ from directory_tree import DisplayTree
 import logArchiveServerGlobal as gv
 import logArchiveServerMgr as mgr
 
-
 slashCar = '\\' if platform.system() == "Windows" else '/'
 
 #-----------------------------------------------------------------------------
@@ -32,7 +31,6 @@ gv.iFTPservice = mgr.FTPService(None)
 gv.iFTPservice.start()
 # Init the web interface.
 gv.iDataMgr = mgr.dataManager()
-
 app = Flask(__name__)
 
 #-----------------------------------------------------------------------------
@@ -41,7 +39,7 @@ app = Flask(__name__)
 @app.route('/index')
 def index():
     """ route to introduction index page."""
-    posts = {'page': 0}  # page index is used to highlight the left page slide bar.
+    posts = {'page':0}  # page index is used to highlight the left page slide bar.
     serverData = gv.iDataMgr.getStorageData()
     posts.update(serverData)
     return render_template('index.html', posts=posts)
@@ -49,24 +47,23 @@ def index():
 #-----------------------------------------------------------------------------
 @app.route('/agentview')
 def agentview():
-    posts = {'page': 1}  # page index is used to highlight the left page slide bar.
+    """ route to all agents general information view page."""
+    posts = {'page': 1}
     posts['agentsInfo'] = gv.iDataMgr.getAllAgentsInfo().values()
-    #print(posts['agentsInfo'])
     return render_template('agentview.html', posts=posts)
 
 #-----------------------------------------------------------------------------
 @app.route('/agent/<path:subpath>')
 def show_directory(subpath=''):
-    print(subpath)
+    """ route to agent log files view page."""
     subpathList = subpath.split('/')
-    if '' in subpathList: subpathList.remove('')
+    if '' in subpathList: subpathList.remove('') # remove the duplicate '///' in url
     if len(subpathList) == 0: abort(404)
     agentName = str(subpathList[0])
     if len(subpathList) == 1 and agentName:gv.iDataMgr.updateAgentFileTree(agentName)
     agentInfo = gv.iDataMgr.getAgentInfo(agentName)
     current_path = None
     # remove the duplicate in the path sub path.
-    agents = [d for d in os.listdir(gv.ROOT_DIR) if os.path.isdir(os.path.join(gv.ROOT_DIR, d))]
     for i in range(len(subpathList)):
         testSubpath = slashCar.join(subpathList[i:])
         testPath = os.path.join(gv.ROOT_DIR, testSubpath)
@@ -80,14 +77,12 @@ def show_directory(subpath=''):
     if os.path.isdir(current_path):
         # List directory contents
         contents = os.listdir(current_path)
-        # print(contents)
         directories = {d: DisplayTree(os.path.join(current_path, d), stringRep=True, showHidden=True, maxDepth=2).replace('\n', '<br>')
                        for d in contents if
                        os.path.isdir(os.path.join(current_path, d))}  
         files = [f for f in contents if os.path.isfile(os.path.join(current_path, f))]
-        #print(files)
         currentPath = current_path.replace(gv.ROOT_DIR, '')
-        if currentPath.startswith(slashCar): currentPath = currentPath[1:]
+        if currentPath.startswith(slashCar): currentPath = currentPath[1:] # remove the first empty slash.
         posts = {
                  'page': 2,
                  'agentInfoDict': agentInfo,
@@ -97,13 +92,14 @@ def show_directory(subpath=''):
                  }
         return render_template('agents.html', posts=posts)
     else:
-        # Serve a file
+        # Serve a file for user to download
         return send_from_directory(gv.ROOT_DIR, subpath)
 
+#-----------------------------------------------------------------------------
 @app.route('/clients')
 def clients():
     posts = {'page': 3}
-    posts['clients'] = mgr.clients_info
+    posts['clients'] = gv.gClientInfo
     return render_template('clients.html', posts=posts)
 
 #-----------------------------------------------------------------------------

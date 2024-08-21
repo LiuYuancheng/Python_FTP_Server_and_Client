@@ -1,9 +1,8 @@
 #-----------------------------------------------------------------------------
 # Name:        logArchiveServerMgr.py
 #
-# Purpose:     This module is used as a project global config file to set the 
-#              constants, parameters and instances which will be used in the 
-#              other modules in the project.
+# Purpose:     This module is the data mangement module which provide the log 
+#              files management and FTP server management.
 #              
 # Author:      Yuancheng Liu
 #
@@ -15,7 +14,6 @@
 
 import os
 import time
-
 import threading
 from pyftpdlib.handlers import FTPHandler
 from directory_tree import DisplayTree
@@ -24,11 +22,35 @@ import ftpComm
 import ConfigLoader
 import logArchiveServerGlobal as gv
 
+#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+class CustomFTPHandler(FTPHandler):
+    """ Custom FTP handler class to record the ftp client connection state (login/logout) 
+        and update the global clients record list.
+    """
+    def on_connect(self):
+        client = {
+            'ip': self.remote_ip,
+            'port': self.remote_port,
+            'datetime': time.strftime('%Y-%m-%d %H:%M:%S',  time.localtime(self.started)),
+        }
+        gv.gClientInfo.append(client)
+        print(f"Client connected from {self.remote_ip}:{self.remote_port} at {client['datetime']}. "
+              f"Total clients connected: {len(gv.gClientInfo)}")
+
+    def on_disconnect(self):
+        for client in gv.gClientInfo:
+            if client['ip'] == self.remote_ip and client['port'] == self.remote_port:
+                gv.gClientInfo.remove(client)
+                break
+        print(f"Client disconnected from {self.remote_ip}:{self.remote_port}. "
+              f"Total clients connected: {len(gv.gClientInfo)}")
+        pass
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 class dataManager(object):
-
+    """ Log file storage management class. """
     def __init__(self) -> None:
         userRcdFile = os.path.join(gv.DIR_PATH, gv.CONFIG_DICT['USER_RCD'])
         userInfoLoader = ConfigLoader.JsonLoader()
@@ -37,29 +59,14 @@ class dataManager(object):
         self.getAllAgentsInfo()
 
     #-----------------------------------------------------------------------------
-    def getAllAgentsInfo(self):
-        folderList = [d for d in os.listdir(gv.ROOT_DIR) if os.path.isdir(os.path.join(gv.ROOT_DIR, d))]
-        print(folderList)
-        for agentID in folderList:
-            if not (agentID in self.agentConfigInfo.keys()):
-                self.agentConfigInfo[agentID] = self.createAgentInfo(agentID)
-        return self.agentConfigInfo
-
-    #-----------------------------------------------------------------------------
-    def getStorageData(self):
-        folderList = [d for d in os.listdir(gv.ROOT_DIR) if os.path.isdir(os.path.join(gv.ROOT_DIR, d))]
-        folderSize = os.path.getsize(gv.ROOT_DIR)
-        storageData = {
-            "FTPport": int(gv.CONFIG_DICT['FTP_SER_PORT']),
-            "rootDir": gv.ROOT_DIR,
-            "nodeUploadMax": int(gv.CONFIG_DICT['MAX_UPLOAD_SPEED'])/1024,
-            "totalSize": int(folderSize),
-            "nodeNum": len(folderList)
-        }
-        return storageData
-    
-    #-----------------------------------------------------------------------------
     def createAgentInfo(self, agentName):
+        """ Scan the agent directory and create the agent information dictionary
+            Args:
+                agentName (str): agent name/ID string
+            Returns:
+                _type_: agent information dictionary, detail refer to the <agentData> 
+                    in this function. 
+        """
         agentData = {
             'ID': None,
             'IP': None,
@@ -80,43 +87,54 @@ class dataManager(object):
                 agentData['UploadInv'] = int(dataDict['UPLOAD_INV'])
                 agentData['Dirtree'] = DisplayTree(agentDirPath, stringRep=True, showHidden=True)
         return agentData
+    
+    #-----------------------------------------------------------------------------
+    def getAllAgentsInfo(self):
+        """ Check the root directory and get all the agent information."""
+        folderList = [d for d in os.listdir(gv.ROOT_DIR) if os.path.isdir(os.path.join(gv.ROOT_DIR, d))]
+        #print(folderList)
+        for agentID in folderList:
+            if not (agentID in self.agentConfigInfo.keys()):
+                self.agentConfigInfo[agentID] = self.createAgentInfo(agentID)
+        return self.agentConfigInfo
 
     #-----------------------------------------------------------------------------
+    def getStorageData(self):
+        """ Get the storage folder and the FTP server configuration data."""
+        folderList = [d for d in os.listdir(gv.ROOT_DIR) if os.path.isdir(os.path.join(gv.ROOT_DIR, d))]
+        folderSize = os.path.getsize(gv.ROOT_DIR)
+        storageData = {
+            "FTPport": int(gv.CONFIG_DICT['FTP_SER_PORT']),
+            "rootDir": gv.ROOT_DIR,
+            "nodeUploadMax": int(gv.CONFIG_DICT['MAX_UPLOAD_SPEED'])/1024,
+            "totalSize": int(folderSize),
+            "nodeNum": len(folderList)
+        }
+        return storageData
+    
+    #-----------------------------------------------------------------------------
     def updateAgentFileTree(self, agentName):
+        """ Refresh and update the file structure tree of the agent.
+            Args:
+                agentName (str): agent name/ID string
+        """
         agentDirPath = os.path.join(gv.ROOT_DIR, agentName)
         if os.path.isdir(agentDirPath):
             self.agentConfigInfo[agentName]['Dirtree'] = DisplayTree(agentDirPath, stringRep=True, showHidden=True)
 
     #-----------------------------------------------------------------------------
     def getAgentInfo(self, agentName):
+        """ Get the agetn information dictionary.
+            Args:
+                agentName (str): agent name/ID string
+            Returns:
+                _type_: agent information dictionary, detail refer to the <agentData> 
+                    in <createAgentInfo> function. 
+        """
         if agentName in self.agentConfigInfo.keys():
             return self.agentConfigInfo[agentName]
         else:
             return self.createAgentInfo(agentName)
-
-#-----------------------------------------------------------------------------
-#-----------------------------------------------------------------------------
-clients_info = []
-class CustomFTPHandler(FTPHandler):
-    def on_connect(self):
-        client = {
-            'ip': self.remote_ip,
-            'port': self.remote_port,
-            'datetime': time.strftime('%Y-%m-%d %H:%M:%S',  time.localtime(self.started)),
-        }
-        clients_info.append(client)
-        print(f"Client connected from {self.remote_ip}:{self.remote_port} at {client['datetime']}. "
-              f"Total clients connected: {len(clients_info)}")
-
-    def on_disconnect(self):
-        for client in clients_info:
-            if client['ip'] == self.remote_ip and client['port'] == self.remote_port:
-                clients_info.remove(client)
-                break
-        print(f"Client disconnected from {self.remote_ip}:{self.remote_port}. "
-              f"Total clients connected: {len(clients_info)}")
-        pass
-
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
@@ -141,10 +159,12 @@ class FTPService(threading.Thread):
                                         ftpHandler=CustomFTPHandler, threadFlg=True)
         print("FTPService inited.")
         
+    #-----------------------------------------------------------------------------
     def run(self):
         print("FTPService is running...")
         self.server.startServer()
 
+    #-----------------------------------------------------------------------------
     def stop(self):
         print("FTPService is stoping...")
         self.server.stopServer()
