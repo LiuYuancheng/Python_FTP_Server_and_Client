@@ -1,9 +1,8 @@
 
 {% extends 'mgmbase.html' %}
+{% block title %} FTP Client Connections {% endblock %}
 
-{% block title %} FTP Client connections {% endblock %}
 {% block mgmContent %}
-
 <ul class="list-group">
     <li class="list-group-item"> 
         <div class="content">
@@ -13,8 +12,8 @@
                 <thead>
                     <tr>
                         <th>IP Address</th>
-                        <th>Port</th>
-                        <th>Connection Datetime</th>
+                        <th>FTP Port</th>
+                        <th>Last Connection Datetime</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -58,5 +57,4 @@
     // Fetch clients on initial load
     window.onload = fetchClients;
 </script>
-
 {% endblock %}

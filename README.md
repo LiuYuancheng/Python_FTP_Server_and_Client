@@ -147,6 +147,7 @@ In the server side user permission config please follow below permission char se
 
 - pyftpdlib : https://pypi.org/project/pyftpdlib/, install: `pip install pyftpdlib`
 - Flask: https://flask.palletsprojects.com/en/3.0.x/, install: `pip install Flask`
+- directory-tree 1.0.0 : https://pypi.org/project/directory-tree/, install: `pip install directory-tree`
 
 ##### Hardware Needed : None
 
@@ -162,18 +163,20 @@ In the server side user permission config please follow below permission char se
 
 
 
-| Folder      | Program File              | Execution Env | Description                                  |
-| ----------- | ------------------------- | ------------- | -------------------------------------------- |
-| logArchiver | AgentLogFolder/*.txt      |               | Log archive agent test case data set.        |
-| logArchiver | ServerLogSorage/*.txt     |               | Log archive server test case data set.       |
-| logArchiver | templates/*.html          | HTML          | Log archive server web interface html pages. |
-| logArchiver | AgentConfig_template.txt  | txt           | Agent config file template.                  |
-| logArchiver | ConfigLoader.py           | python 3.7 +  | Config file loading module.                  |
-| logArchiver | logArchiveAgent.py        | python 3.7 +  | Log archive agent main program.              |
-| logArchiver | logArchiveServer.py       | python 3.7 +  | Log archive server main program.             |
-| logArchiver | ServerConfig_template.txt |               | Server config file template.                 |
-| logArchiver | uploadRcd.json            | JSON          | Uploaded file record file.                   |
-| logArchiver | userRecord.json           | JSON          | User record file.                            |
+| Folder      | Program File              | Execution Env | Description                                                  |
+| ----------- | ------------------------- | ------------- | ------------------------------------------------------------ |
+| logArchiver | AgentLogFolder/*.txt      |               | Log archive agent test case data set.                        |
+| logArchiver | ServerLogSorage/*.txt     |               | Log archive server test case data set.                       |
+| logArchiver | templates/*.html          | HTML          | Log archive server web interface html pages.                 |
+| logArchiver | AgentConfig_template.txt  | txt           | Agent config file template.                                  |
+| logArchiver | ConfigLoader.py           | python 3.7 +  | Config file loading module.                                  |
+| logArchiver | logArchiveAgent.py        | python 3.7 +  | Log archive agent main program.                              |
+| logArchiver | logArchiveServer.py       | python 3.7 +  | Log archive server main program.                             |
+| logArchiver | logArchiveServerGlobal.py | python 3.7 +  | Log archive server global parameter init module.             |
+| logArchiver | logArchiveServerMgr.py    | python 3.7 +  | Log files management and FTP server management functions module |
+| logArchiver | ServerConfig_template.txt |               | Server config file template.                                 |
+| logArchiver | uploadRcd.json            | JSON          | Uploaded file record file.                                   |
+| logArchiver | userRecord.json           | JSON          | User record file.                                            |
 
 
 
@@ -305,7 +308,19 @@ python logAchiveAgent.py
 
 ##### View Logs Contents From Web UI
 
-To view the archived log file in the server, type in the URL `http://<webhost_IPaddress>:5000` to view the web interface and download the log files:
+To view the archived log file in the server, type in the URL `http://<webhost_IPaddress>:5000` to access the log archive service home page:
+
+![](doc/img/ui01.png)
+
+Select the Agent view from the left nav bar to check the connected log upload client:
+
+![](doc/img/ui02.png)
+
+Click the `Link to Agent Page` in the table to view the detailed log files for the node:
+
+![](doc/img/ui03.png)
+
+Click the file view and download the log files:
 
 ![](doc/img/webUI.png)
 
@@ -322,6 +337,8 @@ To view the archived log file in the server, type in the URL `http://<webhost_IP
 ### Problem and Solution
 
 - Refer to `doc/ProblemAndSolution.md`
+
+FTP server service which can run parallel with the program main thread.
 
 
 ------

@@ -3,10 +3,10 @@
 # Name:        logArchiveServer.py
 #
 # Purpose:     This module will provide a FTP server which can run in parallel 
-#              thread for file transfer and provide a web UI for user to check 
-#              the log files in the server.
+#              thread to handle log files submission and provide a web UI for user 
+#              to check the log files in the server.
 # 
-# Author:      Yuancheng Liu
+# Author:      Yuancheng Liu, Sandy Seah
 #
 # Created:     2024/07/25
 # Version:     v_0.1.1
@@ -26,11 +26,12 @@ slashCar = '\\' if platform.system() == "Windows" else '/'
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
-# Start he FTP server service thread
+# Start the FTP server service thread
 gv.iFTPservice = mgr.FTPService(None)
 gv.iFTPservice.start()
-# Init the web interface.
+# Init the log file manager.
 gv.iDataMgr = mgr.dataManager()
+# Init the web interface.
 app = Flask(__name__)
 
 #-----------------------------------------------------------------------------
@@ -55,33 +56,35 @@ def agentview():
 #-----------------------------------------------------------------------------
 @app.route('/agent/<path:subpath>')
 def show_directory(subpath=''):
-    """ route to agent log files view page."""
+    """ route to individual agent log files view page."""
     subpathList = subpath.split('/')
     if '' in subpathList: subpathList.remove('') # remove the duplicate '///' in url
     if len(subpathList) == 0: abort(404)
     agentName = str(subpathList[0])
     if len(subpathList) == 1 and agentName:gv.iDataMgr.updateAgentFileTree(agentName)
     agentInfo = gv.iDataMgr.getAgentInfo(agentName)
-    current_path = None
+    
+    currentPath = None
     # remove the duplicate in the path sub path.
     for i in range(len(subpathList)):
         testSubpath = slashCar.join(subpathList[i:])
         testPath = os.path.join(gv.ROOT_DIR, testSubpath)
         if os.path.exists(testPath):
-            current_path = testPath
+            currentPath = testPath
             subpath = '/'.join(subpathList[i:])
             break
     
-    if current_path is None: abort(404)
-    print(current_path)
-    if os.path.isdir(current_path):
+    if currentPath is None: abort(404)
+    print(currentPath)
+    if os.path.isdir(currentPath):
         # List directory contents
-        contents = os.listdir(current_path)
-        directories = {d: DisplayTree(os.path.join(current_path, d), stringRep=True, showHidden=True, maxDepth=2).replace('\n', '<br>')
+        contents = os.listdir(currentPath)
+        directories = {d: DisplayTree(os.path.join(currentPath, d), stringRep=True, showHidden=True, maxDepth=2).replace('\n', '<br>')
                        for d in contents if
-                       os.path.isdir(os.path.join(current_path, d))}  
-        files = [f for f in contents if os.path.isfile(os.path.join(current_path, f))]
-        currentPath = current_path.replace(gv.ROOT_DIR, '')
+                       os.path.isdir(os.path.join(currentPath, d))}  
+        files = [f for f in contents if os.path.isfile(os.path.join(currentPath, f))]
+        # change the file system current path to the web displayed current path format.
+        currentPath = currentPath.replace(gv.ROOT_DIR, '')
         if currentPath.startswith(slashCar): currentPath = currentPath[1:] # remove the first empty slash.
         posts = {
                  'page': 2,
