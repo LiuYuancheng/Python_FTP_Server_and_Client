@@ -16,7 +16,7 @@
 
 import os
 import platform
-from flask import Flask, render_template, send_from_directory, abort
+from flask import Flask, render_template, send_from_directory, abort, request, redirect, url_for, session
 from directory_tree import DisplayTree
 
 import logArchiveServerGlobal as gv
@@ -33,6 +33,7 @@ gv.iFTPservice.start()
 gv.iDataMgr = mgr.dataManager()
 # Init the web interface.
 app = Flask(__name__)
+app.secret_key = 'insert_secret_key_here'
 
 #-----------------------------------------------------------------------------
 # web request handling functions.
@@ -104,6 +105,31 @@ def clients():
     posts = {'page': 3}
     posts['clients'] = gv.gClientInfo
     return render_template('clients.html', posts=posts)
+
+#-----------------------------------------------------------------------------
+@app.route('/users', methods=['GET', 'POST'])
+def users():
+    posts = {'page': 4}
+    if request.method == 'POST':
+        username = request.form.get('user')
+        passwd = request.form.get('password')
+        perm = request.form.get('perms')
+        try:
+            gv.iDataMgr.createNewUser(username, passwd, perm)
+            session['message'] = 'User added successfully!'
+            session['category'] = 'success'
+        except ValueError as e:
+            session['message'] = str(e)
+            session['category'] = 'warning'
+        return redirect(url_for('users'))
+
+    posts = {
+             'users': gv.iDataMgr.getAllUserInfo(),
+             'message': session.pop('message', None),
+             'category': session.pop('category', None)
+             }
+
+    return render_template('users.html', posts=posts)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
