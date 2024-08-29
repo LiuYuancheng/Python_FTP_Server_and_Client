@@ -15,9 +15,6 @@
                         <th>IP Address</th>
                         <th>FTP Port</th>
                         <th>Last Connection Datetime</th>
-                        <th>Port</th>
-                        <th>Login User Name</th>
-                        <th>Connection Datetime</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -25,7 +22,6 @@
                         <tr>
                             <td>{{ client.ip }}</td>
                             <td>{{ client.port }}</td>
-                            <td>{{ client.username }}</td>
                             <td>{{ client.datetime }}</td>
                         </tr>
                     {% endfor %}

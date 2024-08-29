@@ -32,7 +32,6 @@ class CustomFTPHandler(FTPHandler):
         client = {
             'ip': self.remote_ip,
             'port': self.remote_port,
-            'username': self.username,
             'datetime': time.strftime('%Y-%m-%d %H:%M:%S',  time.localtime(self.started)),
         }
         gv.gClientInfo.append(client)

@@ -98,8 +98,38 @@ def show_directory(subpath=''):
                  }
         return render_template('agents.html', posts=posts)
     else:
-        # Serve a file for user to download
-        return send_from_directory(gv.ROOT_DIR, subpath)
+        # display file in web browser
+        absolutePath = os.path.join(gv.ROOT_DIR, subpath)
+        if os.path.isfile(absolutePath) and absolutePath.endswith('.txt'):
+            with open(absolutePath, 'r', encoding='utf-8') as file:
+                content = file.read()
+        else:
+            return send_from_directory(gv.ROOT_DIR, subpath)
+        currentPath = absolutePath.replace(gv.ROOT_DIR, '')
+        if currentPath.startswith(slashCar): currentPath = currentPath[1:]
+        print(absolutePath)
+        posts = {
+                 'page': 2,
+                 'agentInfoDict': agentInfo,
+                 'crtPathStr': currentPath.replace(slashCar, '/'),
+                 'content': content,
+                 }
+        return render_template('logfile.html', posts=posts)
+
+#-----------------------------------------------------------------------------
+@app.route('/download/<path:subpath>')
+def download_file(subpath):
+
+    subpathList = subpath.split('/')
+    if '' in subpathList: subpathList.remove('') # remove the duplicate '///' in url
+    if len(subpathList) == 0: abort(404)
+
+    # Check if the file exists and is a text file
+    absolutePath = os.path.join(gv.ROOT_DIR, subpath)
+    if os.path.isfile(absolutePath) and absolutePath.endswith('.txt'):
+        return send_file(absolutePath, as_attachment=True)
+    else:
+        abort(404)  # File not found or not a valid text file
 
 #-----------------------------------------------------------------------------
 @app.route('/clients')
