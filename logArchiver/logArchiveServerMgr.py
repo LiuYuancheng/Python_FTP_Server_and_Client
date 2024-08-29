@@ -149,16 +149,17 @@ class dataManager(object):
 
     #-----------------------------------------------------------------------------
     def createNewUser(self, username, passwd, perm):
-        """ Checks that user does not exist, creates the user profile and update userRecord.json.
+        """ Creates the user profile and update userRecord.json.
             Args:
                 username (str): username string, must not already exist
                 passwd (str): password string
                 perm (str): permissions string, must either be empty or contain the letters in DEF_PERM
             Returns:
-                dict() : user information dictionary. Return ValueError if information not properly entered.
+                dict() : user information dictionary.
+                Return ValueError if username already exist or information is not properly entered.
                 Updates userRecord.json with new user profile.
         """
-        if perm == '':
+        if perm == '' or perm == None:
             perm = ftpComm.DEF_PERM
         if not username or not passwd:
             raise ValueError("Username and Password fields must be provided.")
@@ -179,6 +180,32 @@ class dataManager(object):
             perm = ''.join(sorted_chars)
 
             self.userData[username] = {'passwd': passwd, 'perm': perm}
+            userRcdFile = os.path.join(gv.DIR_PATH, gv.CONFIG_DICT['USER_RCD'])
+            userInfoLoader = ConfigLoader.JsonLoader()
+            userInfoLoader.jsonFilePath = userRcdFile
+            userInfoLoader.jsonData = self.userData
+            userInfoLoader.updateRcdFile()
+            return self.userData
+
+    #-----------------------------------------------------------------------------
+    def deleteUser(self, username, passwd):
+        """ Deletes the user profile and updates userRecord.json.
+            Args:
+                username (str): username string, must already exist
+                passwd (str): password string
+            Returns:
+                dict() : user information dictionary.
+                Return ValueError if username does not exist or password is wrong.
+                Updates userRecord.json with new user profile.
+        """
+        if not username or not passwd:
+            raise ValueError("Username and Password fields must be provided.")
+        elif username not in self.userData:
+            raise ValueError(f"User '{username}' does not exists.")
+        elif self.userData[username]['passwd'] != passwd:
+            raise ValueError(f"Password for '{username}' does not match.")
+        else:
+            self.userData.pop(username, None)
             userRcdFile = os.path.join(gv.DIR_PATH, gv.CONFIG_DICT['USER_RCD'])
             userInfoLoader = ConfigLoader.JsonLoader()
             userInfoLoader.jsonFilePath = userRcdFile

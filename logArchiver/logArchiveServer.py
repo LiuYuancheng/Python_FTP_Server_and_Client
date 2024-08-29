@@ -16,7 +16,7 @@
 
 import os
 import platform
-from flask import Flask, render_template, send_from_directory, abort, request, redirect, url_for, session
+from flask import Flask, render_template, send_from_directory, abort, request, redirect, url_for, session, send_file
 from directory_tree import DisplayTree
 
 import logArchiveServerGlobal as gv
@@ -50,12 +50,14 @@ def index():
 @app.route('/agentview')
 def agentview():
     """ route to all agents general information view page."""
-    posts = {'page': 1}
-    posts['agentsInfo'] = gv.iDataMgr.getAllAgentsInfo().values()
+    posts = {
+             'page': 1,
+             'agentsInfo': gv.iDataMgr.getAllAgentsInfo().values()
+             }
     return render_template('agentview.html', posts=posts)
 
 #-----------------------------------------------------------------------------
-@app.route('/agent/<path:subpath>')
+@app.route('/agent/<path:subpath>', methods=['GET', 'POST'])
 def show_directory(subpath=''):
     """ route to individual agent log files view page."""
     subpathList = subpath.split('/')
@@ -102,28 +104,42 @@ def show_directory(subpath=''):
 #-----------------------------------------------------------------------------
 @app.route('/clients')
 def clients():
-    posts = {'page': 3}
-    posts['clients'] = gv.gClientInfo
+    posts = {
+             'page': 3,
+             'clients': gv.gClientInfo
+             }
     return render_template('clients.html', posts=posts)
 
 #-----------------------------------------------------------------------------
 @app.route('/users', methods=['GET', 'POST'])
 def users():
-    posts = {'page': 4}
-    if request.method == 'POST':
-        username = request.form.get('user')
-        passwd = request.form.get('password')
-        perm = request.form.get('perms')
+    if request.method == 'POST' and 'addUserSubmit' in request.form:
+        username = request.form.get('addUser')
+        passwd = request.form.get('addPassword')
+        perm = request.form.get('addPerms')
         try:
             gv.iDataMgr.createNewUser(username, passwd, perm)
-            session['message'] = 'User added successfully!'
+            session['message'] = f"User '{username}' added successfully!"
             session['category'] = 'success'
         except ValueError as e:
             session['message'] = str(e)
             session['category'] = 'warning'
         return redirect(url_for('users'))
 
+    elif request.method == 'POST' and 'delUserSubmit' in request.form:
+        username = request.form.get('delUser')
+        passwd = request.form.get('delPassword')
+        try:
+            gv.iDataMgr.deleteUser(username, passwd)
+            session['message'] = f"User '{username}' deleted successfully!"
+            session['category'] = 'info'
+        except ValueError as e:
+            session['message'] = str(e)
+            session['category'] = 'warning'
+        return redirect(url_for('users'))
+
     posts = {
+             'page': 4,
              'users': gv.iDataMgr.getAllUserInfo(),
              'message': session.pop('message', None),
              'category': session.pop('category', None)
