@@ -16,7 +16,7 @@
 
 import os
 import platform
-from flask import Flask, render_template, send_from_directory, abort
+from flask import Flask, render_template, send_from_directory, abort, request, redirect, url_for, session, send_file
 from directory_tree import DisplayTree
 
 import logArchiveServerGlobal as gv
@@ -33,6 +33,7 @@ gv.iFTPservice.start()
 gv.iDataMgr = mgr.dataManager()
 # Init the web interface.
 app = Flask(__name__)
+app.secret_key = 'insert_secret_key_here'
 
 #-----------------------------------------------------------------------------
 # web request handling functions.
@@ -49,12 +50,14 @@ def index():
 @app.route('/agentview')
 def agentview():
     """ route to all agents general information view page."""
-    posts = {'page': 1}
-    posts['agentsInfo'] = gv.iDataMgr.getAllAgentsInfo().values()
+    posts = {
+             'page': 1,
+             'agentsInfo': gv.iDataMgr.getAllAgentsInfo().values()
+             }
     return render_template('agentview.html', posts=posts)
 
 #-----------------------------------------------------------------------------
-@app.route('/agent/<path:subpath>')
+@app.route('/agent/<path:subpath>', methods=['GET', 'POST'])
 def show_directory(subpath=''):
     """ route to individual agent log files view page."""
     subpathList = subpath.split('/')
@@ -95,15 +98,84 @@ def show_directory(subpath=''):
                  }
         return render_template('agents.html', posts=posts)
     else:
-        # Serve a file for user to download
-        return send_from_directory(gv.ROOT_DIR, subpath)
+        # display file in web browser
+        absolutePath = os.path.join(gv.ROOT_DIR, subpath)
+        if os.path.isfile(absolutePath) and absolutePath.endswith('.txt'):
+            with open(absolutePath, 'r', encoding='utf-8') as file:
+                content = file.read()
+        else:
+            return send_from_directory(gv.ROOT_DIR, subpath)
+        currentPath = absolutePath.replace(gv.ROOT_DIR, '')
+        if currentPath.startswith(slashCar): currentPath = currentPath[1:]
+        print(absolutePath)
+        posts = {
+                 'page': 2,
+                 'agentInfoDict': agentInfo,
+                 'crtPathStr': currentPath.replace(slashCar, '/'),
+                 'content': content,
+                 }
+        return render_template('logfile.html', posts=posts)
+
+#-----------------------------------------------------------------------------
+@app.route('/download/<path:subpath>')
+def download_file(subpath):
+
+    subpathList = subpath.split('/')
+    if '' in subpathList: subpathList.remove('') # remove the duplicate '///' in url
+    if len(subpathList) == 0: abort(404)
+
+    # Check if the file exists and is a text file
+    absolutePath = os.path.join(gv.ROOT_DIR, subpath)
+    if os.path.isfile(absolutePath) and absolutePath.endswith('.txt'):
+        return send_file(absolutePath, as_attachment=True)
+    else:
+        abort(404)  # File not found or not a valid text file
 
 #-----------------------------------------------------------------------------
 @app.route('/clients')
 def clients():
-    posts = {'page': 3}
-    posts['clients'] = gv.gClientInfo
+    posts = {
+             'page': 3,
+             'clients': gv.gClientInfo
+             }
     return render_template('clients.html', posts=posts)
+
+#-----------------------------------------------------------------------------
+@app.route('/users', methods=['GET', 'POST'])
+def users():
+    if request.method == 'POST' and 'addUserSubmit' in request.form:
+        username = request.form.get('addUser')
+        passwd = request.form.get('addPassword')
+        perm = request.form.get('addPerms')
+        try:
+            gv.iDataMgr.createNewUser(username, passwd, perm)
+            session['message'] = f"User '{username}' added successfully!"
+            session['category'] = 'success'
+        except ValueError as e:
+            session['message'] = str(e)
+            session['category'] = 'warning'
+        return redirect(url_for('users'))
+
+    elif request.method == 'POST' and 'delUserSubmit' in request.form:
+        username = request.form.get('delUser')
+        passwd = request.form.get('delPassword')
+        try:
+            gv.iDataMgr.deleteUser(username, passwd)
+            session['message'] = f"User '{username}' deleted successfully!"
+            session['category'] = 'info'
+        except ValueError as e:
+            session['message'] = str(e)
+            session['category'] = 'warning'
+        return redirect(url_for('users'))
+
+    posts = {
+             'page': 4,
+             'users': gv.iDataMgr.getAllUserInfo(),
+             'message': session.pop('message', None),
+             'category': session.pop('category', None)
+             }
+
+    return render_template('users.html', posts=posts)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

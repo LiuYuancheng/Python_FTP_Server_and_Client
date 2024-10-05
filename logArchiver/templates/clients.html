@@ -7,10 +7,11 @@
     <li class="list-group-item"> 
         <div class="content">
             {% set clients = posts['clients']%}
-            <h3> FTP Client connections: {{ clients|length }}</h3>
+            <h3> Active FTP client connections: {{ clients|length }}</h3>
+            <p></p>
             <table class="table table-dark table-bordered">
                 <thead>
-                    <tr>
+                    <tr class="table-primary">
                         <th>IP Address</th>
                         <th>FTP Port</th>
                         <th>Last Connection Datetime</th>

@@ -58,6 +58,8 @@ class dataManager(object):
         if os.path.exists(userRcdFile):
             userInfoLoader = ConfigLoader.JsonLoader()
             userInfoLoader.loadFile(userRcdFile)
+            userData = userInfoLoader.getJsonData()
+            self.userData = userData
         # load all the agents' config data from the uploaded agents' config file.
         self.agentConfigInfo = {}
         self.getAllAgentsInfo()
@@ -138,6 +140,77 @@ class dataManager(object):
         agentDirPath = os.path.join(gv.ROOT_DIR, agentName)
         if os.path.isdir(agentDirPath):
             self.agentConfigInfo[agentName]['Dirtree'] = DisplayTree(agentDirPath, stringRep=True, showHidden=True)
+
+    #-----------------------------------------------------------------------------
+    def getAllUserInfo(self):
+        """ Gets all the current users' information """
+        return self.userData
+
+    #-----------------------------------------------------------------------------
+    def createNewUser(self, username, passwd, perm):
+        """ Creates the user profile and update userRecord.json.
+            Args:
+                username (str): username string, must not already exist
+                passwd (str): password string
+                perm (str): permissions string, must either be empty or contain the letters in DEF_PERM
+            Returns:
+                dict() : user information dictionary.
+                Return ValueError if username already exist or information is not properly entered.
+                Updates userRecord.json with new user profile.
+        """
+        if perm == '' or perm == None:
+            perm = ftpComm.DEF_PERM
+        if not username or not passwd:
+            raise ValueError("Username and Password fields must be provided.")
+        elif username in self.userData:
+            raise ValueError(f"User '{username}' already exists.")
+        elif not all(char in set('elradfmwMT') for char in perm):
+            raise ValueError("Permissions contain invalid characters.")
+        else:
+            # reorders perms to fit the standard 'elradfmwM' order
+            seen = set()
+            filtered_chars = []
+            for char in perm:
+                if char in set('elradfmwMT') and char not in seen:
+                    seen.add(char)
+                    filtered_chars.append(char)
+            order_index = {char: i for i, char in enumerate('elradfmwMT')}
+            sorted_chars = sorted(filtered_chars, key=lambda char: order_index.get(char))
+            perm = ''.join(sorted_chars)
+
+            self.userData[username] = {'passwd': passwd, 'perm': perm}
+            userRcdFile = os.path.join(gv.DIR_PATH, gv.CONFIG_DICT['USER_RCD'])
+            userInfoLoader = ConfigLoader.JsonLoader()
+            userInfoLoader.jsonFilePath = userRcdFile
+            userInfoLoader.jsonData = self.userData
+            userInfoLoader.updateRcdFile()
+            return self.userData
+
+    #-----------------------------------------------------------------------------
+    def deleteUser(self, username, passwd):
+        """ Deletes the user profile and updates userRecord.json.
+            Args:
+                username (str): username string, must already exist
+                passwd (str): password string
+            Returns:
+                dict() : user information dictionary.
+                Return ValueError if username does not exist or password is wrong.
+                Updates userRecord.json with new user profile.
+        """
+        if not username or not passwd:
+            raise ValueError("Username and Password fields must be provided.")
+        elif username not in self.userData:
+            raise ValueError(f"User '{username}' does not exists.")
+        elif self.userData[username]['passwd'] != passwd:
+            raise ValueError(f"Password for '{username}' does not match.")
+        else:
+            self.userData.pop(username, None)
+            userRcdFile = os.path.join(gv.DIR_PATH, gv.CONFIG_DICT['USER_RCD'])
+            userInfoLoader = ConfigLoader.JsonLoader()
+            userInfoLoader.jsonFilePath = userRcdFile
+            userInfoLoader.jsonData = self.userData
+            userInfoLoader.updateRcdFile()
+            return self.userData
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

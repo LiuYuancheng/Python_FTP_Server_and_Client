@@ -1,0 +1,143 @@
+{% extends 'mgmbase.html' %}
+
+{% block title %} Node Agent Users Information List {% endblock %}
+
+{% block style%} <style></style> {% endblock %}
+
+{% block mgmContent %}
+    <ul class="list-group">
+        <li class="list-group-item">
+            <h3> Users List </h3>
+
+            <hr>
+
+            <button type="button" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#addUserCollapse" aria-expanded="false" aria-controls="addUserCollapse">
+                + Add New User</button>
+            <button type="button" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#delUserCollapse" aria-expanded="false" aria-controls="delUserCollapse">
+                - Delete Existing User</button>
+
+            <p></p>
+
+                {% if posts['message']  %}
+                    <div class="alert alert-{{ posts['category'] }} alert-dismissible fade show" role="alert">
+                        {{ posts['message'] }}
+                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+
+            <div class="collapse" id="addUserCollapse">
+                <form id="addUserForm" action="{{url_for('users')}}" method="POST">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi-person-fill"></i></span>
+                        <input id="addUser" type="text" class="form-control" name="addUser" placeholder="Username">
+
+                        <span class="input-group-text"><i class="bi-lock-fill"></i></span>
+                        <input id="addPassword" type="password" class="form-control password" name="addPassword" placeholder="Password">
+                        <span class="input-group-text"><i class="bi bi-eye-slash togglePassword" data-target="#addPassword"></i></span>
+                    </div>
+
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi-pencil-fill"></i></span>
+                        <input id="addPerms" type="text" class="form-control" name="addPerms" placeholder="Permission (Default = 'elradfmwM')">
+                        <select class="form-select" multiple id="permslist" name="permslist" onchange="updatePermsField()">
+                            <optgroup label="Read permissions">
+                                <option value="e">'e': Change directory</option>
+                                <option value="l">'l': List files</option>
+                                <option value="r">'r': Retrieve file from the server</option>
+                            <optgroup label="Read permissions">
+                                <option value="a">'a': Append data to an existing file</option>
+                                <option value="d">'d': Delete file or directory</option>
+                                <option value="f">'f': Rename file or directory</option>
+                                <option value="m">'m': Create directory</option>
+                                <option value="w">'w': Store a file to the server</option>
+                                <option value="M">'M': Change file mode / permission</option>
+                                <option value="T">'T': Change file modification time</option>
+                            </optgroup>
+                        </select>
+
+                        <input type="submit" class="btn btn-secondary" name="addUserSubmit" value="Add User">
+                    </div>
+                </form>
+            </div>
+
+
+            <div class="collapse" id="delUserCollapse">
+                <form id="delUserForm" action="{{url_for('users')}}" method="POST">
+                    <div class="input-group">
+<!--                        <label for="delUserForm"></label>-->
+                        <span class="input-group-text"><i class="bi-person-fill"></i></span>
+                        <input id="delUser" type="text" class="form-control" name="delUser" placeholder="Username">
+
+                        <span class="input-group-text"><i class="bi-lock-fill"></i></span>
+                        <input id="delPassword" type="password" class="form-control password" name="delPassword" placeholder="Password">
+                        <span class="input-group-text"><i class="bi bi-eye-slash togglePassword" data-target="#delPassword"></i></span>
+
+                        <input type="submit" class="btn btn-secondary" name="delUserSubmit" value="Delete User">
+                    </div>
+                </form>
+            </div>
+        </li>
+
+        <li class="list-group-item">
+            <table class="table table-dark table-bordered">
+                <thead>
+                    <tr class="table-primary">
+                        <th>Login Username</th>
+                        <th>Password</th>
+                        <th>Permissions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user, info in posts['users'].items() %}
+                        <tr>
+                            <td>{{ user }}</td>
+                            <td>{{ info['passwd'] }}</td>
+                            <td>{{ info['perm']}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </li>
+    </ul>
+    <script>
+<!--    // Controls both add user and delete user show password field-->
+        const togglePasswords = document.querySelectorAll('.togglePassword');
+        togglePasswords.forEach(toggle => {
+            toggle.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                const targetId = this.getAttribute('data-target');
+                const password = document.querySelector(targetId);
+
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+
+                targetId.classList.toggle('bi-eye');
+                targetId.classList.toggle('bi-eye-slash');
+            });
+        });
+
+        function updatePermsField() {
+            var selectElement = document.getElementById('permslist');
+            var selectedOptions = Array.from(selectElement.selectedOptions);
+            var selectedValues = selectedOptions.map(option => option.value);
+            document.getElementById('addPerms').value = selectedValues.join('');
+        }
+
+<!--    // Ensure add user and delete user fields are not both present at the same time-->
+        document.addEventListener('DOMContentLoaded', () => {
+            const addButton = document.querySelector('[data-bs-target="#addUserCollapse"]');
+            const deleteButton = document.querySelector('[data-bs-target="#delUserCollapse"]');
+
+            const addCollapse = new bootstrap.Collapse(document.getElementById('addUserCollapse'), {toggle: false});
+            const deleteCollapse = new bootstrap.Collapse(document.getElementById('delUserCollapse'), {toggle: false});
+
+            addButton.addEventListener('click', () => {
+                if (deleteCollapse._element.classList.contains('show')) {deleteCollapse.hide();}
+            });
+            deleteButton.addEventListener('click', () => {
+                if (addCollapse._element.classList.contains('show')) {addCollapse.hide();}
+            });
+        });
+    </script>
+{% endblock %}
