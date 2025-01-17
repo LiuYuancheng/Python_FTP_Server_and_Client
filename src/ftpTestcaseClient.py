@@ -37,7 +37,7 @@ def main():
     uploadFile = os.path.join(serverDir, 'uploadfile.pdf')
     if os.path.exists(uploadFile):os.remove(uploadFile)
     if os.path.exists(serverDir):os.rmdir(serverDir)
-    client.swithToDir('/')
+    client.switchToDir('/')
     client.createDir('client1')
     dirs = client.listDirInfo(detail=False)
     if 'client1' in dirs:
@@ -46,7 +46,7 @@ def main():
         print("- Fail")
     # Test case 2
     print("Test case 2: test upload file")
-    client.swithToDir('client1')
+    client.switchToDir('client1')
     localFile = os.path.join(dir,'Railway_signaling.pdf')
     client.uploadFile(localFile, 'uploadfile.pdf')
     dirs = client.listDirInfo(detail=False)
@@ -56,7 +56,7 @@ def main():
         print("- Fail")
     # Test case 3
     print("Test case 3: test downloadfile")
-    client.swithToDir('/')
+    client.switchToDir('/')
     downloadfilepath = os.path.join(dir, 'downloadfile.pdf')
     client.downloadFile('Hacking - NMap Quick Reference Guide.pdf', downloadfilepath)
     if os.path.exists(downloadfilepath):

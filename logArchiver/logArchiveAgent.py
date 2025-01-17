@@ -149,14 +149,14 @@ class LogAchiveAgent():
         """ Swith to the FTP server side's agent root/<Agent_ID> directory, if the home 
             directory is not exist, create the home drectory in server side.
         """
-        self.client.swithToDir('/')
+        self.client.switchToDir('/')
         homeDir = self.agentID
         try:
-            self.client.swithToDir(homeDir)
+            self.client.switchToDir(homeDir)
         except Exception as err:
             print("Home folder not found, create a new home folder.")
             self.client.createDir(homeDir)
-            self.client.swithToDir(homeDir)
+            self.client.switchToDir(homeDir)
 
     #-----------------------------------------------------------------------------
     def startUpload(self, localFilePath):
@@ -175,10 +175,10 @@ class LogAchiveAgent():
             for dir in dirList[0:-1]:
                 if dir != '':
                     try:
-                        self.client.swithToDir(dir)
+                        self.client.switchToDir(dir)
                     except Exception as erro:
                         self.client.createDir(dir)
-                        self.client.swithToDir(dir)
+                        self.client.switchToDir(dir)
         # Upload log file
         fileName = dirList[-1]
         try:

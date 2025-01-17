@@ -211,7 +211,7 @@ class ftpClient(object):
         self.client.mkd(dirname)
 
     #-----------------------------------------------------------------------------
-    def swithToDir(self, dir):
+    def switchToDir(self, dir):
         """ Switch to the target directory. """
         self.client.cwd(dir)
 
@@ -280,7 +280,7 @@ def main():
             choice = int(input())
             if choice == 0:
                 dir = input("Input dir:")
-                client.swithToDir(dir)
+                client.switchToDir(dir)
             elif choice == 1:
                 localFile = input("Input local file path:")
                 remoteFile = input("Input remote file name:")
