@@ -1,0 +1,23 @@
+# This is the config file template for the module <fileSychServerRun.py>
+# Setup the parameter with below format (every line follows <key>:<val> format, the
+# key can not be changed):
+
+#-----------------------------------------------------------------------------
+# Web test mode flag: True start without init the FTP server
+TEST_MODE:True
+
+#-----------------------------------------------------------------------------
+# Init the FTP server parameters
+FTP_SER_PORT:8081
+# default max speed for client download: 300 Kb/sec (300 * 1024)
+MAX_UPLOAD_SPEED:307200
+# default max speed for client upload:  300 Kb/sec (300 * 1024)
+MAX_DOWNLOAD_SPEED:307200
+
+#-----------------------------------------------------------------------------
+# User record json file, need to put in same folder with the logArchiveServer.py
+USER_RCD:userRecord.json
+
+#-----------------------------------------------------------------------------
+# Log file path, need to put in same folder with the logArchiveServer.py
+SHARE_DIR:serverStorage
