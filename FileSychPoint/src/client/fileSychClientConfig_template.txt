@@ -1,0 +1,22 @@
+# This is the config file template for the module <fileSychServerRun.py>
+# Setup the parameter with below format (every line follows <key>:<val> format, the
+# key can not be changed):
+
+#-----------------------------------------------------------------------------
+# Web test mode flag: True start without init the FTP server
+TEST_MODE:True
+
+#-----------------------------------------------------------------------------
+SERVER_IP:127.0.0.1
+SERVER_PORT:8081
+
+USER_NAME:agent
+USER_PASSWD:P@ssw0rd
+
+#-----------------------------------------------------------------------------
+# Log file path, need to put in same folder with the logArchiveServer.py
+LOCAL_DIR:localStorage
+
+#-----------------------------------------------------------------------------
+# The interval of the file sync, in seconds
+SYCH_INTERVAL:5
