@@ -79,7 +79,7 @@ The FTP-server module includes the following features:
 
 The FTP-client module includes the following features:
 
-- **Connection Handling** : Login the server and manages FTP server reconnections.
+- **Connection Handling** : Login the server and manages FTP server reconnection.
 - **File System Check and Switch** : Checks whether the folder exists on the server side and switches to the relevant directory.
 - **File Upload and Download** :  Uploads files to and downloads files from the server.
 
@@ -276,7 +276,7 @@ Change the `AgentConfig_template.txt` to `AgentConfig.txt` then follow the comme
 AGENT_ID:Test
 
 #-----------------------------------------------------------------------------
-# FTP server info and login credentials, don't uplaod the credentials to the Github
+# FTP server info and login credentials, don't upload the credentials to the Github
 FTP_SER_IP:127.0.0.1
 FTP_SER_PORT:8081
 USER_NAME:agent
@@ -294,7 +294,7 @@ LOG_DIR:AgentLogFolder
 LOG_PF:.txt
 
 #-----------------------------------------------------------------------------
-# Time interval between 2 uplaod processes, in seconds.
+# Time interval between 2 upload processes, in seconds.
 UPLOAD_INV:10
 ```
 

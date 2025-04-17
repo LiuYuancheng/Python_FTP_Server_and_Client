@@ -20,7 +20,7 @@ Description:
 - provide the module used for the infra monitor hub's frontend web host and the 
 backend data base handler .
 
-Modules inclided in the current package: 
+Modules included in the current package: 
 
 1. ConfigLoader.py: 
 - Provide API to load the not stand text format config file's data.

@@ -1,5 +1,5 @@
 # This is the config file template for the module <logArchiveServer.py>
-# Setup the paramter with below format (every line follows <key>:<val> format, the
+# Setup the parameter with below format (every line follows <key>:<val> format, the
 # key can not be changed):
 
 #-----------------------------------------------------------------------------
@@ -7,7 +7,7 @@
 TEST_MODE:True
 
 #-----------------------------------------------------------------------------
-# Init the FTP server paramters
+# Init the FTP server parameter
 FTP_SER_PORT:8081
 # default max speed for client download: 300 Kb/sec (300 * 1024)
 MAX_UPLOAD_SPEED:307200
@@ -23,7 +23,7 @@ USER_RCD:userRecord.json
 
 #-----------------------------------------------------------------------------
 # FTP storage root folder 
-LOG_DIR:ServerLogSorage
+LOG_DIR:ServerLogStorage
 LOG_PF:.txt
 
 #-----------------------------------------------------------------------------

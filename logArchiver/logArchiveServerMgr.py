@@ -170,5 +170,5 @@ class FTPService(threading.Thread):
 
     #-----------------------------------------------------------------------------
     def stop(self):
-        print("FTPService is stoping...")
+        print("FTPService is stopping...")
         self.server.stopServer()

@@ -8,7 +8,7 @@ AGENT_ID:Test
 AGENT_IP:127.0.0.1
 
 #-----------------------------------------------------------------------------
-# FTP server info and login credentials, don't uplaod the credentials to the Github
+# FTP server info and login credentials, don't upload the credentials to the Github
 FTP_SER_IP:127.0.0.1
 FTP_SER_PORT:8081
 USER_NAME:agent
@@ -26,5 +26,5 @@ LOG_DIR:AgentLogFolder
 LOG_PF:.txt
 
 #-----------------------------------------------------------------------------
-# Time interval between 2 uplaod processes, in seconds.
+# Time interval between 2 upload processes, in seconds.
 UPLOAD_INV:10

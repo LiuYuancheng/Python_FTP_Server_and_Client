@@ -45,6 +45,6 @@ ROOT_DIR = os.path.join(dirpath, CONFIG_DICT['LOG_DIR'])
 gTestMD = CONFIG_DICT['TEST_MODE']
 gClientInfo = []
 
-#-------<GLOBAL PARAMTERS>-----------------------------------------------------
+#-------<GLOBAL PARAMETERS>-----------------------------------------------------
 iFTPservice = None
 iDataMgr = None

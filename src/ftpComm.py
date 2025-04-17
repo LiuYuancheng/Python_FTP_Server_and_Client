@@ -73,7 +73,7 @@ class ftpServer(object):
             userDict (dict, optional): Available user dictionary. Defaults to DEF_USER.
             readMaxSp (int, optional): FTP client max allowed download speed(Kb). Defaults to DEF_READ_MAX_SPEED.
             writeMaxSp (_type_, optional): FTP client max allowed upload speed(Kb). Defaults to DEF_WRITE_MAX_SPEED.
-            threadFlg (bool, optional): flag to identify whether can run the server in subthread. Defaults to False.
+            threadFlg (bool, optional): flag to identify whether can run the server in sub-thread. Defaults to False.
         """
         # Init the server basic parameters
         self._port = int(port)
@@ -97,7 +97,7 @@ class ftpServer(object):
         self.handler.dtp_handler = self.dtphandler
 
         # Define a customized banner (welcome string returned when client connects)
-        self.handler.banner = "FTP server ready, license port: %s" % str(self._port)
+        self.handler.banner = "FTP server ready, listening port: %s" % str(self._port)
 
         # Init the FTP server.
         address = ('0.0.0.0', self._port)

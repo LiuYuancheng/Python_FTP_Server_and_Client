@@ -2,7 +2,7 @@
 #-----------------------------------------------------------------------------
 # Name:        logAchiveAgent.py
 #
-# Purpose:     This module will provide a log sychronization agent running on the 
+# Purpose:     This module will provide a log synchronization agent running on the 
 #              machine which need to archive the log file to transfer the new generated
 #              log file to the logArchive server via ftp regularly.
 # 
@@ -25,7 +25,7 @@
     4. It will start the FTP client to log in to the log archive server's agent 
         home folder and build the directory tree which exactly same as the agent's 
         local log directory tree.
-    5. Tranfer the log file to the related directory in the server.
+    5. Transfer the log file to the related directory in the server.
     6. After finished transfer one new log files, it will update the record file 
     7. After finished transfer all log file, wait time T (set by user in the config 
         file) and start from step 2.
@@ -129,7 +129,7 @@ class LogAchiveAgent():
 
     #-----------------------------------------------------------------------------
     def getNewUploadFiles(self):
-        """ Compate the logs in the folder and check with the record file to find 
+        """ Compare the logs file in the folder and check with the record file to find 
             the new log files.
             Returns:
                 list(): sorted list of new log files' path.
@@ -146,8 +146,8 @@ class LogAchiveAgent():
 
     #-----------------------------------------------------------------------------
     def switchToHome(self):
-        """ Swith to the FTP server side's agent root/<Agent_ID> directory, if the home 
-            directory is not exist, create the home drectory in server side.
+        """ Switch to the FTP server side's agent root/<Agent_ID> directory, if the home 
+            directory is not exist, create the home directory in server side.
         """
         self.client.switchToDir('/')
         homeDir = self.agentID
@@ -160,7 +160,7 @@ class LogAchiveAgent():
 
     #-----------------------------------------------------------------------------
     def startUpload(self, localFilePath):
-        """ Start to uplaod a local file to the FTP server related folder.
+        """ Start to upload a local file to the FTP server related folder.
             Args:
                 localFilePath (str): local file path.
             Returns:
@@ -176,7 +176,7 @@ class LogAchiveAgent():
                 if dir != '':
                     try:
                         self.client.switchToDir(dir)
-                    except Exception as erro:
+                    except Exception as err:
                         self.client.createDir(dir)
                         self.client.switchToDir(dir)
         # Upload log file
@@ -185,9 +185,9 @@ class LogAchiveAgent():
             self.client.uploadFile(localFilePath, fileName)
             print("LogAchiveAgent: successfully uploaded file %s" %fileName)
             return True 
-        except Exception as erro:
+        except Exception as err:
             print("LogAchiveAgent: Failed to upload file %s" %fileName)
-            print("Error: %s" %erro)
+            print("Error: %s" %str(err))
             return False 
 
     #-----------------------------------------------------------------------------
