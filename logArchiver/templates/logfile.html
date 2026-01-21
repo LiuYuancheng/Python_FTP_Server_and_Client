@@ -1,0 +1,57 @@
+{% extends 'mgmbase.html' %}
+
+{% block title %} Node Logs Archive File View {% endblock %}
+
+{% block style%} <style></style> {% endblock %}
+
+{% block mgmContent %}
+    {% set agentInfo = posts['agentInfoDict'] %}
+    {% set subpath = posts['crtPathStr'] %}
+
+    <ul class="list-group">
+        <li class="list-group-item">
+            <h3> Agent Log Viewer </h3>
+            <p> </p>
+            <hr>
+            <p> <b> Agent ID: </b><span class="badge bg-primary"> {{ agentInfo['ID'] }}</span>
+                <b> Agent IP Address: </b> <span class="badge bg-secondary"> {{ agentInfo['IP'] }} </span>
+            </p>
+            <hr>
+            <p>
+                <h5 style="display: inline; margin-bottom: 10px"> Current working directory: </h5>
+                <span style="display: inline; margin-left: 5px;">
+                    {% if subpath %}
+                        {% set path_parts = subpath.split('/') %}
+                        {% set ns = namespace(url="/agent/") %}
+                        {% for part in path_parts %}
+                            {% set ns.url = ns.url ~ '/' ~ part %}
+                            {% if not loop.last %}
+                                <a href="{{ ns.url }}">{{ part }}</a> /
+                            {% else %}
+                                {{ part }} /
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </span>
+            </p>
+        </li>
+
+        <li class="list-group-item">
+            <div class="row">
+                <div class="col">
+                    <h3 style="display: inline-block">File Content</h3>
+                </div>
+
+                <div class="col">
+                    <div class="float-right">
+                        <a href='download/{{ subpath }}'>Download file <i class="bi-download"></i></a>
+                    </div>
+                </div>
+                <hr>
+            <pre>{{ posts['content'] }}</pre>
+            </div>
+        </li>
+    </ul>
+
+
+{% endblock %}

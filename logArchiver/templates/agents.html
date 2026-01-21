@@ -1,35 +1,15 @@
-
-
 {% extends 'mgmbase.html' %}
 
 {% block title %} Node Logs Archive Service {% endblock %}
 
 {% block style%} 
-<style> 
-    .tooltip {
-        border: 1px solid #000;
-        border-radius: 8px;
-        position: relative;
-    }
+<style>
     .tooltip .tooltip-inner {
         text-align: left;
         font-size: 14px;
-        background: #000;
-        padding: 10px;
-        opacity: 1;
-        border-radius: 8px;
-        min-width: 300px;
     }
-    .tooltip::after {
-        position: absolute;
-        content: "";
-        top: 45%;
-        right: 100%;
-        width: 0;
-        height: 0;
-        border-top: 5px solid transparent;
-        border-right: 5px solid #000;
-        border-bottom: 5px solid transparent;
+    .tooltip .tooltip-inner p {
+        margin-bottom: 0;
     }
 </style>
 {% endblock %}
@@ -62,22 +42,19 @@
                     {% set files = posts['filesList']%}
                     <p>
                         <h5 style="display: inline; margin-bottom: 10px"> Current working directory: </h5>
+                        <p></p>
                         <span style="display: inline; margin-left: 5px;">
                             {% if subpath %}
-                                {% set ns = namespace(url="") %}
                                 {% set path_parts = subpath.split('/') %}
-                                <a href="/">Root</a>
-                                {% set ns.url = '/agent/' %}
+                                {% set ns = namespace(url="/agent/") %}
                                 {% for part in path_parts %}
                                     {% set ns.url = ns.url ~ '/' ~ part %}
                                     {% if not loop.last %}
-                                        / <a href="{{ ns.url }}">{{ part }}</a>
+                                        <a href="{{ ns.url }}">{{ part }}</a> /
                                     {% else %}
-                                        / {{ part }}
+                                        {{ part }} /
                                     {% endif %}
                                 {% endfor %}
-                            {% else %}
-                                Root
                             {% endif %}
                         </span>
                     </p>
@@ -91,10 +68,11 @@
                     </div>
 
                     <div class="directory-section">
+                        <p>
                         {% if directories %}
                             <ul id="directory-ul" class="item-list">
                                 {% for directory, content in directories.items() %}
-                                    <li> <a href="{{ subpath }}/{{ directory }}"
+                                    <li> <a href="/agent/{{ subpath }}/{{ directory }}"
                                             data-bs-toggle="tooltip" data-bs-placement="right"
                                             data-bs-html="true"
                                             title="<p> {% autoescape false %} {{content}} {% endautoescape %}</p>">
@@ -102,8 +80,9 @@
                                     </li>
                                 {% endfor %}
                             </ul>
+                        </p>
                         {% else %}
-                            <p style="margin: 15px 0 15px 20px">No sub-directories.</p>
+                            <p style="margin-left: 15px">No sub-directories.</p>
                         {% endif %}
                     </div>
 
@@ -116,14 +95,17 @@
                     </div>
 
                     <div class="file-section">
+                        <p>
                         {% if files %}
                             <ul id="file-ul" class="item-list">
                                 {% for file in files %}
-                                    <li><a href="{{ subpath }}/{{ file }}" target="_blank">{{ file }}</a></li>
+                                    <li><a href="/agent/{{ subpath }}/{{ file }}">
+                                           {{ file }}</a></li>
                                 {% endfor %}
                             </ul>
+                        </p>
                         {% else %}
-                            <p style="margin: 15px 0 15px 20px">No files available.</p>
+                            <p style="margin-left: 15px">No files available.</p>
                         {% endif %}
                     </div>
                 </div>

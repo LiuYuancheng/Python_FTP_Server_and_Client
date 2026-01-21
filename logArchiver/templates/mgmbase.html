@@ -6,22 +6,27 @@
     <div class="col-sm-2">
         <div class="list-group">
             <a href="{{ url_for('index')}}" class="list-group-item list-group-item-action 
-            {% if posts['page'] == 0 %} bg-secondary {% endif %}"> Introduction </a>
+            {% if posts['page'] == 0 %} text-white bg-secondary {% endif %}"> Introduction </a>
         </div>
 
         <div class="list-group">
             <a href="{{ url_for('agentview')}}" class="list-group-item list-group-item-action 
-            {% if posts['page'] == 1 %} bg-secondary {% endif %}"> Agents View </a>            
+            {% if posts['page'] == 1 %} text-white bg-secondary {% endif %}"> Agents View </a>
         </div>
 
         <div class="list-group">
             <a href="#" class="list-group-item list-group-item-action 
-            {% if posts['page'] == 2 %} bg-secondary {% endif %}"> Agent Log View </a>            
+            {% if posts['page'] == 2 %} text-white bg-secondary {% endif %}"> Agent Log View </a>
         </div>
 
         <div class="list-group">
             <a href="{{ url_for('clients')}}" class="list-group-item list-group-item-action 
-            {% if posts['page'] == 3 %} bg-secondary {% endif %}"> FTP Clients Connection</a>            
+            {% if posts['page'] == 3 %} text-white bg-secondary {% endif %}"> FTP Clients Connection</a>
+        </div>
+
+        <div class="list-group">
+            <a href="{{ url_for('users')}}" class="list-group-item list-group-item-action
+            {% if posts['page'] == 4 %} text-white bg-secondary {% endif %}"> Users List</a>
         </div>
     </div>
 
